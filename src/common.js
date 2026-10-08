@@ -1,3 +1,4 @@
+import './mobile-layout.js';
 export const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 export const storage={get(k,f){try{return JSON.parse(localStorage.getItem('fangcun-'+k))??f}catch{return f}},set(k,v){try{localStorage.setItem('fangcun-'+k,JSON.stringify(v))}catch{toast('当前浏览器无法保存记录')}}};
 let toastTimer;export function toast(t){$('#toast').textContent=t;$('#toast').classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('#toast').classList.remove('show'),2400)}
