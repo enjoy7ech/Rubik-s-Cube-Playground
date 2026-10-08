@@ -1,3 +1,4 @@
+const embeddedHandbook=new URLSearchParams(location.search).has('handbook');if(embeddedHandbook)document.body.classList.add('handbook-page');
 import {AlgorithmPlayer} from './algorithm-player.js';
 import {createCube,parseAlg,inverse,move,apply,drawCube} from './cube.js';
 import {$,$$,storage,toast} from './common.js';
@@ -22,3 +23,8 @@ try{data=await(await fetch('algs.json')).json();data.push({id:'parity-oll',group
 
 if(new URLSearchParams(location.search).has('favorites'))$('#favorites').click();
 document.addEventListener('keydown',e=>{if(e.key==='/'&&!['INPUT','SELECT'].includes(e.target.tagName)){e.preventDefault();$('#search').focus()}});
+
+if(embeddedHandbook){
+ window.addEventListener('message',event=>{if(event.origin!==location.origin||event.source!==parent)return;if(event.data?.type==='handbook-close'){$$('dialog[open]').forEach(dialog=>dialog.close());demoPlayer?.close()}else if(event.data?.type==='handbook-favorites')$('#favorites').click()});
+ document.addEventListener('keydown',event=>{if(event.key==='Escape'&&!$('dialog[open]')){event.preventDefault();parent.postMessage({type:'handbook-dismiss'},location.origin)}});
+}
