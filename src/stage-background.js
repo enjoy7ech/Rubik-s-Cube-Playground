@@ -19,7 +19,7 @@ export function initStageBackground(viewport){
  const reduced=matchMedia('(prefers-reduced-motion: reduce)');
  function render(){frame=0;x+=(targetX-x)*.09;y+=(targetY-y)*.09;for(const piece of pieces){const depth=Number(piece.dataset.depth);piece.style.transform=`translate3d(${(x*depth).toFixed(2)}px,${(y*depth).toFixed(2)}px,0) rotate(${piece.dataset.tilt||0}deg)`}if(Math.abs(targetX-x)+Math.abs(targetY-y)>.05)frame=requestAnimationFrame(render)}
  function animate(){if(!frame)frame=requestAnimationFrame(render)}
- viewport.addEventListener('pointermove',event=>{if(reduced.matches||event.pointerType!=='mouse'||event.buttons)return;const rect=viewport.getBoundingClientRect();targetX=((event.clientX-rect.left)/rect.width-.5)*24;targetY=((event.clientY-rect.top)/rect.height-.5)*18;animate()});
+ viewport.addEventListener('pointermove',event=>{if(reduced.matches||event.pointerType!=='mouse'||event.buttons)return;const rect=viewport.getBoundingClientRect(),scale=rect.width<=600?.5:1;targetX=((event.clientX-rect.left)/rect.width-.5)*24*scale;targetY=((event.clientY-rect.top)/rect.height-.5)*18*scale;animate()});
  viewport.addEventListener('pointerleave',()=>{targetX=targetY=0;animate()});
  reduced.addEventListener('change',()=>{if(reduced.matches){targetX=targetY=0;animate()}});
 }

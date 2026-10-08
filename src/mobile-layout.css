@@ -1,7 +1,10 @@
 .mobile-mode-select{display:none}
 .mobile-turn-tools{display:contents}
 .mobile-turn-tools>summary{display:none}
+.stage-background{inset:20px;overflow:visible}
 @media(max-width:600px){
+ .stage-background{inset:18px}
+ .mobile-handbook-open .cloud-note,.mobile-handbook-open .paper-plane,.mobile-handbook-open .leaf-sprig,.mobile-handbook-open .tiny-rainbow,.mobile-handbook-open .mini-star,.mobile-handbook-open .mini-ring{display:none}
  body{padding-bottom:calc(58px + env(safe-area-inset-bottom))}
  .side-rail{inset:auto 0 0;width:100%;height:calc(58px + env(safe-area-inset-bottom));padding:0 12px env(safe-area-inset-bottom);border-right:0;border-top:1px solid #e1e7d5;z-index:40;background:#faf8f2}
  .side-rail .rail-brand,.side-rail .rail-bottom{display:none}
@@ -9,7 +12,7 @@
  .side-rail nav a{width:auto;flex:1;max-width:150px;padding:6px 8px;border-radius:12px;font-size:11px;gap:3px}
  .side-rail nav b{font-size:19px;line-height:20px}
  .app-shell{margin-left:0}
- .app-header{height:50px;padding:0 16px}
+ .app-header{height:calc(50px + env(safe-area-inset-top));padding:env(safe-area-inset-top) 16px 0}
  .app-name{font-size:19px}
  .app-name span,.header-right .online-dot{display:none}
  .help-button{width:32px;height:32px;font-size:14px}
@@ -20,7 +23,7 @@
  .game-toolbar p{font-size:11px;margin:0;line-height:1.5}
  .game-toolbar .mobile-mode-select{display:block;padding:8px 10px;font-size:12px;max-width:120px;border:1px solid #e1e7d5;border-radius:12px;background:#fffdf6;color:#758966}
  .game-layout{gap:10px}
- .game-stage{height:calc(100dvh - 155px);max-height:720px;min-height:340px;padding:10px 12px;border-radius:18px}
+ .game-stage{height:calc(100dvh - 175px - env(safe-area-inset-top) - env(safe-area-inset-bottom));max-height:none;min-height:300px;padding:10px 12px;border-radius:18px}
  .stage-top{font-size:11px}
  .stage-tag{font-size:11px}
  .game-stage .cube-hint,.game-stage .scramble-details{display:none}
@@ -43,7 +46,7 @@
  #handbookDialog .handbook-window-actions button{width:36px;height:36px}
  #handbookDialog .flower-close-icon{width:34px;height:34px}
  #restoreHandbook{right:12px;bottom:calc(70px + env(safe-area-inset-bottom));font-size:12px;padding:10px 14px}
- .mobile-handbook-open .game-stage{height:calc(52dvh - 167px);min-height:130px;max-height:none}
+ .mobile-handbook-open .game-stage{height:calc(52dvh - 167px - env(safe-area-inset-top) - env(safe-area-inset-bottom));min-height:130px;max-height:none}
  .mobile-handbook-open .cube-viewport{min-height:100px}
  .mobile-handbook-open .game-stage .cube-actions,.mobile-handbook-open .mobile-turn-tools,.mobile-handbook-open .stage-top,.mobile-handbook-open .game-stage>button{display:none}
  .mobile-handbook-open .game-sidebar{display:none}
