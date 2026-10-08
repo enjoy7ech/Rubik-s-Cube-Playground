@@ -1,5 +1,6 @@
 import {walkthrough} from './tutorial-walkthrough.js';
 import {createCube,parseAlg,inverse,apply,palette} from './cube.js';
+import {addYellowCrossTeaching} from './beginner-teaching.js';
 
 export const guides={beginner:[
  {purpose:'把四条白棱放到白色中心周围，并让它们的侧色对齐中心。',brief:'先做一朵白色小花，再一条条送到底面。\n角块先不用管，只看有两种颜色的棱块。',check:'底面出现白十字，四条棱的侧色也与中心同色。顶面是否形成黄十字，这一步不用管。',captions:['白棱分散，还没形成小花。','四片白花瓣围住黄色中心。','底面白十字完成；顶面黄十字还没好。']},
@@ -33,8 +34,9 @@ export function addLessonGuide(lesson,key,index,alg,customInitial){
  const states=key==='beginner'&&index===0?[initial,apply(structuredClone(initial),parseAlg(walkthrough[0].alg).slice(0,4)),final]:[initial,final];
  const section=document.createElement('section');section.className='middle-explainer lesson-picture-guide';section.setAttribute('aria-label','本课目的与前后示意');
  const purpose=document.createElement('div');purpose.className='middle-purpose';const heading=document.createElement('b');heading.textContent='这一步解决什么？';const p=document.createElement('p');p.textContent=guide.purpose;purpose.append(heading,p);section.append(purpose);
+ if(key==='beginner'&&index===3)addYellowCrossTeaching(section,initial);
  const figures=document.createElement('div');figures.className='middle-diagram-pair'+(states.length===3?' three-diagrams':'');
- for(const [i,state]of states.entries()){const figure=document.createElement('figure');figure.innerHTML=net(state,index,key,i===states.length-1);const caption=document.createElement('figcaption'),b=document.createElement('b'),span=document.createElement('span');b.textContent=states.length===3?['① 起点','② 小花完成','③ 白十字完成'][i]:i===0?'① 开始时':'② 完成后';span.textContent=guide.captions[i];caption.append(b,span);figure.append(caption);figures.append(figure)}section.append(figures);
+ for(const [i,state]of states.entries()){const figure=document.createElement('figure');figure.innerHTML=net(state,index,key,i===states.length-1);const caption=document.createElement('figcaption'),b=document.createElement('b'),span=document.createElement('span');b.textContent=states.length===3?['① 起点','② 小花完成','③ 白十字完成'][i]:i===0?'① 开始时':'② 完成后';span.textContent=guide.captions[i];caption.append(b,span);figure.append(caption);figures.append(figure)}if(key==='beginner'&&index===3){const details=document.createElement('details'),summary=document.createElement('summary');summary.textContent='查看本局演示前后的展开图';details.append(summary,figures);section.append(details)}else section.append(figures);
  const check=document.createElement('p');check.className='middle-read-guide';const b=document.createElement('strong');b.textContent='怎样算完成：';check.append(b,document.createTextNode(guide.check));section.append(check);
  const note=document.createElement('p');note.className='picture-key';note.textContent='绿线框标出要检查的位置。棱有两色，角有三色。左、后两面可在三维演示中转动查看。';section.append(note);lesson.append(section);
 }

@@ -2,6 +2,27 @@
 .mobile-turn-tools{display:contents}
 .mobile-turn-tools>summary{display:none}
 .stage-background{inset:20px;overflow:visible}
+.guide-rounds,.guide-notation{margin:12px 0;color:#748663;font-size:12px}
+.guide-rounds summary,.guide-notation summary{cursor:pointer;padding:6px 0}
+.guide-rounds ol{padding-left:23px;margin:8px 0}
+.guide-rounds li{padding:7px 0;border-bottom:1px solid #e9eddf}
+.guide-rounds li p{margin:3px 0;font-size:12px;line-height:1.8}
+.guide-rounds li b{font-size:12px;color:#6c8158}
+.guide-preparation{color:#89977c}
+.guide-method{font-size:12px;line-height:1.9;color:#7b8c6b}
+.fixed-method-teaching{margin:14px 0;font-size:12px;color:#7c8e6e}
+.fixed-method-teaching h3{font-size:13px;margin:8px 0}
+.fixed-method-teaching>p,.fixed-method-teaching li{font-size:12px;line-height:1.9}
+.fixed-method-teaching ol{padding-left:23px}
+.pattern-cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:12px 0}
+.pattern-card{border:1px solid #e2e8d9;border-radius:12px;padding:10px;background:#f8faf2;text-align:center}
+.pattern-card.active{border-color:#a4b98b;background:#eef4e4}
+.pattern-card svg{display:block;max-height:125px;width:100%;margin:auto}
+.pattern-card b{font-size:12px;display:block;color:#6f845d}
+.pattern-card p{font-size:11px!important;line-height:1.6;margin:8px 0}
+.pattern-card>span{font-size:11px;color:#819871}
+.method-check{padding:10px;border-radius:10px;background:#edf2e4}
+@media(max-width:600px){.pattern-cards{grid-template-columns:1fr}.pattern-card{display:grid;grid-template-columns:80px 1fr;gap:2px 10px;text-align:left;align-items:center}.pattern-card svg{grid-column:1;grid-row:1 / 4;height:98px}.pattern-card b,.pattern-card p,.pattern-card>span{grid-column:2}.pattern-card p{margin:3px 0}}
 @media(max-width:600px){
  .stage-background{inset:18px}
  .mobile-handbook-open .cloud-note,.mobile-handbook-open .paper-plane,.mobile-handbook-open .leaf-sprig,.mobile-handbook-open .tiny-rainbow,.mobile-handbook-open .mini-star,.mobile-handbook-open .mini-ring{display:none}

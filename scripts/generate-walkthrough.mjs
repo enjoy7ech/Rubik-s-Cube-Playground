@@ -2,23 +2,20 @@ import fs from 'node:fs';
 import {createCube,apply,parseAlg,move} from '../src/cube.js';
 import {matchLayer,layerScores} from '../src/layer-match.js';
 import {whiteCrossInitial,whiteCrossAlgorithm,whiteCrossNotes} from '../src/white-cross-lesson.js';
+import {yellowCrossStep} from '../src/beginner-teaching.js';
 const data=JSON.parse(fs.readFileSync('src/algs.json')),chapters=[],colors=['黄','白','粉','橙','绿','蓝'];let state=structuredClone(whiteCrossInitial);
 const expected=new Map(createCube().map(s=>[s.n.join(','),s.c]));
 const describeMove=t=>({R:'右面',L:'左面',U:'顶面',D:'底面',F:'前面',B:'后面'})[t[0]]+(t.includes('2')?'转半圈':t.includes("'")?'逆时针转':'顺时针转')+'（'+t+'）';
 function add(alg,notes){const initial=structuredClone(state);apply(state,parseAlg(alg));chapters.push({initial,alg,notes,final:structuredClone(state)});console.log('Chapter',chapters.length,parseAlg(alg).length,'moves',layerScores(state));}
 add(whiteCrossAlgorithm,whiteCrossNotes);
 function yellowCrossPlan(initial){
- const formula=parseAlg("F R U R' U' F'"),queue=[{state:structuredClone(initial),tokens:[],groups:0}];
- for(let i=0;i<queue.length;i++){
-  const entry=queue[i],scores=layerScores(entry.state);if(scores[3]===4&&scores[4]<4&&scores[5]<4)return entry.tokens.join(' ');
-  if(entry.groups===3)continue;
-  for(const setup of [[],['U'],["U'"],['U2']]){
-   const tokens=[...setup,...formula],next=apply(structuredClone(entry.state),tokens);
-   if(!layerScores(next).slice(0,3).every(n=>n===4))throw Error('Yellow-cross formula broke the first two layers');
-   queue.push({state:next,tokens:[...entry.tokens,...tokens],groups:entry.groups+1});
-  }
+ const formula=parseAlg("F R U R' U' F'"),state=structuredClone(initial),tokens=[];
+ for(let round=0;layerScores(state)[3]<4&&round<3;round++){
+  const instruction=yellowCrossStep(state),group=[...instruction.preparation,...formula];apply(state,group);tokens.push(...group);
+  if(!layerScores(state).slice(0,3).every(n=>n===4))throw Error('Yellow-cross formula broke the first two layers');
  }
- throw Error('Beginner yellow-cross formula cannot solve this sample');
+ if(layerScores(state)[3]!==4)throw Error('Beginner yellow-cross formula cannot solve this sample');
+ return tokens.join(' ');
 }
 function targets(before,after,stage){const pieces=new Map();for(const s of after){if(stage===1?s.p[1]!==-1||s.p.filter(v=>v!==0).length!==3:s.p[1]!==0||s.p.filter(v=>v!==0).length!==2)continue;const key=s.p.join(',');if(!pieces.has(key))pieces.set(key,[]);pieces.get(key).push(s)}const names=[];for(const [key,piece]of pieces){if(!piece.every(s=>s.c===expected.get(s.n.join(','))))continue;if(before.filter(s=>s.p.join(',')===key).every(s=>s.c===expected.get(s.n.join(','))))continue;names.push(piece.map(s=>colors[s.c]).join('／')+(stage===1?'角块':'棱块'))}return names.join('、')}
 for(const stage of [1,2,3]){
