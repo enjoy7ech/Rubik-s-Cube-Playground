@@ -1,0 +1,1 @@
+{"name":"fangcun-cube-club","private":true,"type":"module","scripts":{"start":"node preview.mjs","test":"node verify.mjs"}}

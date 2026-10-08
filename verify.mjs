@@ -1,0 +1,6 @@
+import assert from 'node:assert/strict';import fs from 'node:fs';import {createCube,move,apply,parseAlg,inverse}from './dist/cube.js';
+const signature=s=>s.map(x=>[...x.p,...x.n,x.c].join(',')).sort().join(';');
+for(const size of [2,3,4,5]){const original=signature(createCube(size));for(const t of ['R','L','U','D','F','B','x','y','z','M','E','S','Rw','Uw','Fw']){const state=createCube(size);for(let i=0;i<4;i++)move(state,t,size);assert.equal(signature(state),original,`${size} ${t} four turns`);apply(state,[t,...inverse([t])],size);assert.equal(signature(state),original,`${size} ${t} inverse`);}}
+const data=JSON.parse(fs.readFileSync('dist/algs.json','utf8'));let count=0;for(const d of data){if(['L3E','L4E'].includes(d.group))continue;const size=d.group==='PBL'?2:d.group==='L2E'?5:3;for(const alg of d.algs){const tokens=parseAlg(alg),state=createCube(size);apply(state,tokens,size);apply(state,inverse(tokens),size);assert.equal(signature(state),signature(createCube(size)),d.id+' inverse');count++;}}
+assert.equal(data.filter(d=>d.group==='OLL').length,57);assert.equal(data.filter(d=>d.group==='PLL').length,21);assert.equal(data.filter(d=>d.group==='F2L').length,41);
+console.log('Verified all move inverses on sizes 2–5, '+count+' algorithm round trips, and complete CFOP case counts.');
