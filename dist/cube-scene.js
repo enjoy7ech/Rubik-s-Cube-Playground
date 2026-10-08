@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import {RoundedBoxGeometry} from './vendor/RoundedBoxGeometry.js';
 import {OrbitControls} from './vendor/OrbitControls.js';
+import {RoomEnvironment} from './vendor/RoomEnvironment.js';
 
 function roundedTile(width,radii){const h=width/2,[bl,br,tr,tl]=radii,s=new THREE.Shape();s.moveTo(-h+bl,-h);s.lineTo(h-br,-h);s.quadraticCurveTo(h,-h,h,-h+br);s.lineTo(h,h-tr);s.quadraticCurveTo(h,h,h-tr,h);s.lineTo(-h+tl,h);s.quadraticCurveTo(-h,h,-h,h-tl);s.lineTo(-h,-h+bl);s.quadraticCurveTo(-h,-h,-h+bl,-h);const geometry=new THREE.ExtrudeGeometry(s,{depth:.052,bevelEnabled:true,bevelThickness:.006,bevelSize:.008,bevelSegments:4,steps:1,curveSegments:16});geometry.computeVertexNormals();return geometry;}
 
@@ -17,9 +18,10 @@ export class CubeScene{
   this.canvas=canvas;this.renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true,powerPreference:'high-performance'});
   this.renderer.setPixelRatio(Math.min(devicePixelRatio,2));this.renderer.outputColorSpace=THREE.SRGBColorSpace;this.renderer.toneMapping=THREE.ACESFilmicToneMapping;this.renderer.toneMappingExposure=.92;this.renderer.shadowMap.enabled=true;this.renderer.shadowMap.type=THREE.PCFSoftShadowMap;
   this.scene=new THREE.Scene();this.camera=new THREE.PerspectiveCamera(32,1,.1,60);this.camera.position.set(5.2,4.2,6.5);
-  this.controls=new OrbitControls(this.camera,canvas);this.controls.target.set(0,-.12,0);this.controls.enableDamping=true;this.controls.dampingFactor=.09;this.controls.enablePan=false;this.controls.minDistance=6;this.controls.maxDistance=14;this.controls.rotateSpeed=.6;this.controls.maxPolarAngle=Math.PI*.90;this.controls.update();
-  // Diffuse lighting keeps the bevels legible without glossy reflections.
-  this.scene.add(new THREE.HemisphereLight(0xffffff,0xe8eae3,2.8));
+  this.controls=new OrbitControls(this.camera,canvas);this.controls.target.set(0,-.12,0);this.controls.enableDamping=true;this.controls.dampingFactor=.09;this.controls.enablePan=false;this.controls.minDistance=6;this.controls.maxDistance=14;this.controls.rotateSpeed=.38;this.controls.maxPolarAngle=Math.PI*.90;this.controls.update();
+  // Broad reflections and a restrained specular response give satin plastic depth.
+  const environment=new RoomEnvironment(),generator=new THREE.PMREMGenerator(this.renderer);this.environment=generator.fromScene(environment,.12).texture;this.scene.environment=this.environment;environment.dispose();generator.dispose();
+  this.scene.add(new THREE.HemisphereLight(0xffffff,0xe8eae3,1.7));
   const key=new THREE.DirectionalLight(0xffffff,.85);key.position.set(-3,9,3);key.castShadow=true;key.shadow.mapSize.set(1024,1024);key.shadow.camera.left=-5;key.shadow.camera.right=5;key.shadow.camera.top=5;key.shadow.camera.bottom=-5;key.shadow.camera.near=.1;key.shadow.camera.far=20;key.shadow.normalBias=.025;key.shadow.bias=-.0001;key.shadow.radius=8;this.scene.add(key);
   const fill=new THREE.DirectionalLight(0xffffff,.35);fill.position.set(5,2,-3);this.scene.add(fill);
   this.floor=new THREE.Mesh(new THREE.PlaneGeometry(35,35),new THREE.ShadowMaterial({color:0x6d795f,opacity:.07}));this.floor.rotation.x=-Math.PI/2;this.floor.position.y=-1.6;this.floor.receiveShadow=true;this.scene.add(this.floor);
@@ -30,9 +32,12 @@ export class CubeScene{
    const label=new THREE.Mesh(this.labelGeometry,faceLetter(letter));label.name='face-'+letter;label.position.set(...normal).multiplyScalar(1.52);label.quaternion.setFromUnitVectors(new THREE.Vector3(0,0,1),new THREE.Vector3(...normal));this.faceLabels.add(label);
   }
   canvas.dataset.faceLabels='R L U D F B';
-  this.bodyMaterial=new THREE.MeshLambertMaterial({color:0x232925});
-  this.tileMaterials=['#eabd49','#f1eee5','#dd7b95','#eaa36b','#62ab89','#6b9dc9'].map(color=>new THREE.MeshLambertMaterial({color}));
-  canvas.dataset.finish='matte';
+  const grainCanvas=document.createElement('canvas');grainCanvas.width=grainCanvas.height=128;const grainContext=grainCanvas.getContext('2d'),grain=grainContext.createImageData(128,128);let seed=173;
+  for(let i=0;i<grain.data.length;i+=4){seed=(Math.imul(seed,1664525)+1013904223)>>>0;const value=112+(seed>>>27);grain.data[i]=grain.data[i+1]=grain.data[i+2]=value;grain.data[i+3]=255}grainContext.putImageData(grain,0,0);
+  this.grainTexture=new THREE.CanvasTexture(grainCanvas);this.grainTexture.wrapS=this.grainTexture.wrapT=THREE.RepeatWrapping;this.grainTexture.repeat.set(3,3);
+  this.bodyMaterial=new THREE.MeshPhysicalMaterial({color:0x758078,roughness:.58,metalness:0,ior:1.35,specularIntensity:.22,envMapIntensity:.14});
+  this.tileMaterials=['#eabd49','#f1eee5','#dd7b95','#eaa36b','#62ab89','#6b9dc9'].map(color=>new THREE.MeshPhysicalMaterial({color,roughness:.46,metalness:0,ior:1.35,specularIntensity:.28,clearcoat:.08,clearcoatRoughness:.6,envMapIntensity:.22,bumpMap:this.grainTexture,bumpScale:.002}));
+  canvas.dataset.finish='satin-plastic';
   this.groups=[];this.stickers=[];this.lastSignature='';this.size=0;this.axis=new THREE.Vector3();this.quaternion=new THREE.Quaternion();
   this.lastTime=0;this.renderer.setAnimationLoop(()=>{this.controls.update();this.renderer.render(this.scene,this.camera)});
   canvas.dataset.renderer='webgl';
@@ -49,7 +54,7 @@ export class CubeScene{
  resetView(){this.camera.position.set(5.2,4.2,6.5);this.controls.target.set(0,-.12,0);this.controls.update()}
  enableLayerDrag({canTurn,onTurn,onPreview,onCancel}){
   const canvas=this.canvas,ray=new THREE.Raycaster();let gesture=null;
-  const end=(commit=false)=>{if(!gesture)return;const g=gesture;gesture=null;this.controls.enabled=true;canvas.style.cursor='grab';if(canvas.hasPointerCapture(g.id))canvas.releasePointerCapture(g.id);if(commit&&g.token&&Math.abs(g.angle)>.1)onTurn(g.token,g.angle);else onCancel();};
+  const end=(commit=false)=>{if(!gesture)return;const g=gesture;gesture=null;this.controls.enabled=true;canvas.style.cursor='grab';if(canvas.hasPointerCapture(g.id))canvas.releasePointerCapture(g.id);if(commit&&g.token&&Math.abs(g.angle)>.18)onTurn(g.token,g.angle);else onCancel();};
   canvas.addEventListener('pointerdown',e=>{
    if(gesture){end();return}if(e.button!==0)return;
    const r=canvas.getBoundingClientRect();ray.setFromCamera(new THREE.Vector2((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1),this.camera);
@@ -68,7 +73,7 @@ export class CubeScene{
     const m=(this.size-1)/2,layer=g.p[best.axis],face=['R','U','F'][best.axis],depth=Math.round(m-layer)+1,dir=best.dot>0?1:-1;
     g.token=(depth===1?'':depth)+face+(dir===1?"'":'');g.direction=best.v.multiplyScalar(dir);g.dir=dir;
    }
-   const distance=Math.max(0,dx*g.direction.x+dy*g.direction.y);g.angle=g.dir*Math.min(Math.PI*.48,distance/95*Math.PI/2);onPreview(g.token,g.angle);
+   const distance=Math.max(0,dx*g.direction.x+dy*g.direction.y),quarterTurnDistance=Math.max(170,Math.min(240,r.height*.48));g.angle=g.dir*Math.min(Math.PI*.48,distance/quarterTurnDistance*Math.PI/2);onPreview(g.token,g.angle);
   },true);
   canvas.addEventListener('pointerup',e=>{if(gesture?.id===e.pointerId){e.stopImmediatePropagation();end(true)}},true);
   canvas.addEventListener('pointercancel',()=>end(),true);canvas.addEventListener('lostpointercapture',()=>end(),true);

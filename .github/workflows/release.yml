@@ -1,0 +1,90 @@
+name: CI and tag release
+
+on:
+  push:
+    branches: ['**']
+    tags: ['**']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  check-and-package:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      artifact_name: ${{ steps.artifact_meta.outputs.name }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+          package-manager-cache: false
+
+      - name: Check JavaScript syntax
+        run: node scripts/check-js.mjs
+
+      - name: Verify cube and tutorial examples
+        run: |
+          npm test
+          node verify-white-cross.mjs
+          node verify-walkthrough.mjs
+          node verify-middle-diagram.mjs
+
+      - name: Package dist.zip
+        shell: pwsh
+        run: ./scripts/package-dist.ps1
+
+      - name: Set artifact name
+        id: artifact_meta
+        run: echo "name=dist-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}" >> "$GITHUB_OUTPUT"
+
+      - name: Upload CI artifact
+        uses: actions/upload-artifact@v6
+        with:
+          name: ${{ steps.artifact_meta.outputs.name }}
+          path: dist.zip
+          if-no-files-found: error
+          retention-days: 30
+
+  release:
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
+    needs: check-and-package
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - name: Download packaged site
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          ARTIFACT_NAME: ${{ needs.check-and-package.outputs.artifact_name }}
+          RUN_ID: ${{ github.run_id }}
+        run: gh run download "$RUN_ID" --repo "$GH_REPO" --name "$ARTIFACT_NAME" --dir .
+
+      - name: Create release and attach dist.zip
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          if gh release view "$RELEASE_TAG" --repo "$GH_REPO" > /dev/null 2>&1; then
+            gh release upload "$RELEASE_TAG" dist.zip --repo "$GH_REPO" --clobber
+          else
+            gh release create "$RELEASE_TAG" dist.zip \
+              --repo "$GH_REPO" \
+              --verify-tag \
+              --title "$RELEASE_TAG" \
+              --generate-notes
+          fi
