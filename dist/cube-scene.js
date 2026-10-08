@@ -1,7 +1,6 @@
 import * as THREE from 'three';
 import {RoundedBoxGeometry} from './vendor/RoundedBoxGeometry.js';
 import {OrbitControls} from './vendor/OrbitControls.js';
-import {RoomEnvironment} from './vendor/RoomEnvironment.js';
 
 function roundedTile(width,radii){const h=width/2,[bl,br,tr,tl]=radii,s=new THREE.Shape();s.moveTo(-h+bl,-h);s.lineTo(h-br,-h);s.quadraticCurveTo(h,-h,h,-h+br);s.lineTo(h,h-tr);s.quadraticCurveTo(h,h,h-tr,h);s.lineTo(-h+tl,h);s.quadraticCurveTo(-h,h,-h,h-tl);s.lineTo(-h,-h+bl);s.quadraticCurveTo(-h,-h,-h+bl,-h);const geometry=new THREE.ExtrudeGeometry(s,{depth:.052,bevelEnabled:true,bevelThickness:.006,bevelSize:.008,bevelSegments:4,steps:1,curveSegments:16});geometry.computeVertexNormals();return geometry;}
 
@@ -19,10 +18,10 @@ export class CubeScene{
   this.renderer.setPixelRatio(Math.min(devicePixelRatio,2));this.renderer.outputColorSpace=THREE.SRGBColorSpace;this.renderer.toneMapping=THREE.ACESFilmicToneMapping;this.renderer.toneMappingExposure=.92;this.renderer.shadowMap.enabled=true;this.renderer.shadowMap.type=THREE.PCFSoftShadowMap;
   this.scene=new THREE.Scene();this.camera=new THREE.PerspectiveCamera(32,1,.1,60);this.camera.position.set(5.2,4.2,6.5);
   this.controls=new OrbitControls(this.camera,canvas);this.controls.target.set(0,-.12,0);this.controls.enableDamping=true;this.controls.dampingFactor=.09;this.controls.enablePan=false;this.controls.minDistance=6;this.controls.maxDistance=14;this.controls.rotateSpeed=.6;this.controls.maxPolarAngle=Math.PI*.90;this.controls.update();
-  const environment=new RoomEnvironment();const generator=new THREE.PMREMGenerator(this.renderer);this.environment=generator.fromScene(environment,.045).texture;this.scene.environment=this.environment;environment.dispose();generator.dispose();
-  this.scene.add(new THREE.HemisphereLight(0xfffbef,0xa9b698,.7));
-  const key=new THREE.DirectionalLight(0xfff5e3,2);key.position.set(-3,9,3);key.castShadow=true;key.shadow.mapSize.set(1024,1024);key.shadow.camera.left=-5;key.shadow.camera.right=5;key.shadow.camera.top=5;key.shadow.camera.bottom=-5;key.shadow.camera.near=.1;key.shadow.camera.far=20;key.shadow.normalBias=.025;key.shadow.bias=-.0001;key.shadow.radius=8;this.scene.add(key);
-  const fill=new THREE.DirectionalLight(0xe3edff,1);fill.position.set(5,2,-3);this.scene.add(fill);
+  // Diffuse lighting keeps the bevels legible without glossy reflections.
+  this.scene.add(new THREE.HemisphereLight(0xffffff,0xe8eae3,2.8));
+  const key=new THREE.DirectionalLight(0xffffff,.85);key.position.set(-3,9,3);key.castShadow=true;key.shadow.mapSize.set(1024,1024);key.shadow.camera.left=-5;key.shadow.camera.right=5;key.shadow.camera.top=5;key.shadow.camera.bottom=-5;key.shadow.camera.near=.1;key.shadow.camera.far=20;key.shadow.normalBias=.025;key.shadow.bias=-.0001;key.shadow.radius=8;this.scene.add(key);
+  const fill=new THREE.DirectionalLight(0xffffff,.35);fill.position.set(5,2,-3);this.scene.add(fill);
   this.floor=new THREE.Mesh(new THREE.PlaneGeometry(35,35),new THREE.ShadowMaterial({color:0x6d795f,opacity:.07}));this.floor.rotation.x=-Math.PI/2;this.floor.position.y=-1.6;this.floor.receiveShadow=true;this.scene.add(this.floor);
   const shadowCanvas=document.createElement('canvas');shadowCanvas.width=shadowCanvas.height=256;const sc=shadowCanvas.getContext('2d'),gradient=sc.createRadialGradient(128,128,5,128,128,128);gradient.addColorStop(0,'rgba(55,75,42,.28)');gradient.addColorStop(.45,'rgba(55,75,42,.16)');gradient.addColorStop(1,'rgba(55,75,42,0)');sc.fillStyle=gradient;sc.fillRect(0,0,256,256);const shadow=new THREE.Mesh(new THREE.PlaneGeometry(5.5,5.5),new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(shadowCanvas),transparent:true,depthWrite:false}));shadow.rotation.x=-Math.PI/2;shadow.position.y=-1.595;this.scene.add(shadow);
   this.root=new THREE.Group();this.scene.add(this.root);this.bodyGeometry=new RoundedBoxGeometry(.968,.968,.968,6,.046);this.tileGeometry=roundedTile(.95,[.07,.07,.07,.07]);this.geometryCache=new Map();
@@ -31,8 +30,9 @@ export class CubeScene{
    const label=new THREE.Mesh(this.labelGeometry,faceLetter(letter));label.name='face-'+letter;label.position.set(...normal).multiplyScalar(1.52);label.quaternion.setFromUnitVectors(new THREE.Vector3(0,0,1),new THREE.Vector3(...normal));this.faceLabels.add(label);
   }
   canvas.dataset.faceLabels='R L U D F B';
-  this.bodyMaterial=new THREE.MeshPhysicalMaterial({color:0x232925,roughness:.37,metalness:0,clearcoat:.3,clearcoatRoughness:.32,envMapIntensity:.24});
-  this.tileMaterials=['#eabd49','#f1eee5','#dd7b95','#eaa36b','#62ab89','#6b9dc9'].map(color=>new THREE.MeshPhysicalMaterial({color,roughness:.25,metalness:0,clearcoat:.72,clearcoatRoughness:.22,envMapIntensity:.35}));
+  this.bodyMaterial=new THREE.MeshLambertMaterial({color:0x232925});
+  this.tileMaterials=['#eabd49','#f1eee5','#dd7b95','#eaa36b','#62ab89','#6b9dc9'].map(color=>new THREE.MeshLambertMaterial({color}));
+  canvas.dataset.finish='matte';
   this.groups=[];this.stickers=[];this.lastSignature='';this.size=0;this.axis=new THREE.Vector3();this.quaternion=new THREE.Quaternion();
   this.lastTime=0;this.renderer.setAnimationLoop(()=>{this.controls.update();this.renderer.render(this.scene,this.camera)});
   canvas.dataset.renderer='webgl';
