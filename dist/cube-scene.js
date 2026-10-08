@@ -5,6 +5,14 @@ import {RoomEnvironment} from './vendor/RoomEnvironment.js';
 
 function roundedTile(width,radii){const h=width/2,[bl,br,tr,tl]=radii,s=new THREE.Shape();s.moveTo(-h+bl,-h);s.lineTo(h-br,-h);s.quadraticCurveTo(h,-h,h,-h+br);s.lineTo(h,h-tr);s.quadraticCurveTo(h,h,h-tr,h);s.lineTo(-h+tl,h);s.quadraticCurveTo(-h,h,-h,h-tl);s.lineTo(-h,-h+bl);s.quadraticCurveTo(-h,-h,-h+bl,-h);const geometry=new THREE.ExtrudeGeometry(s,{depth:.052,bevelEnabled:true,bevelThickness:.006,bevelSize:.008,bevelSegments:4,steps:1,curveSegments:16});geometry.computeVertexNormals();return geometry;}
 
+function faceLetter(letter){
+ const canvas=document.createElement('canvas');canvas.width=canvas.height=256;
+ const ctx=canvas.getContext('2d');ctx.font='700 166px Arial, sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
+ ctx.strokeStyle='rgba(255,253,244,.9)';ctx.lineWidth=12;ctx.lineJoin='round';ctx.strokeText(letter,128,138);ctx.fillStyle='#354334';ctx.fillText(letter,128,138);
+ const texture=new THREE.CanvasTexture(canvas);texture.colorSpace=THREE.SRGBColorSpace;
+ return new THREE.MeshBasicMaterial({map:texture,transparent:true,depthWrite:false,toneMapped:false});
+}
+
 export class CubeScene{
  constructor(canvas){
   this.canvas=canvas;this.renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true,powerPreference:'high-performance'});
@@ -18,6 +26,11 @@ export class CubeScene{
   this.floor=new THREE.Mesh(new THREE.PlaneGeometry(35,35),new THREE.ShadowMaterial({color:0x6d795f,opacity:.07}));this.floor.rotation.x=-Math.PI/2;this.floor.position.y=-1.6;this.floor.receiveShadow=true;this.scene.add(this.floor);
   const shadowCanvas=document.createElement('canvas');shadowCanvas.width=shadowCanvas.height=256;const sc=shadowCanvas.getContext('2d'),gradient=sc.createRadialGradient(128,128,5,128,128,128);gradient.addColorStop(0,'rgba(55,75,42,.28)');gradient.addColorStop(.45,'rgba(55,75,42,.16)');gradient.addColorStop(1,'rgba(55,75,42,0)');sc.fillStyle=gradient;sc.fillRect(0,0,256,256);const shadow=new THREE.Mesh(new THREE.PlaneGeometry(5.5,5.5),new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(shadowCanvas),transparent:true,depthWrite:false}));shadow.rotation.x=-Math.PI/2;shadow.position.y=-1.595;this.scene.add(shadow);
   this.root=new THREE.Group();this.scene.add(this.root);this.bodyGeometry=new RoundedBoxGeometry(.968,.968,.968,6,.046);this.tileGeometry=roundedTile(.95,[.07,.07,.07,.07]);this.geometryCache=new Map();
+  this.faceLabels=new THREE.Group();this.scene.add(this.faceLabels);this.labelGeometry=new THREE.PlaneGeometry(.62,.62);
+  for(const [letter,normal] of [['R',[1,0,0]],['L',[-1,0,0]],['U',[0,1,0]],['D',[0,-1,0]],['F',[0,0,1]],['B',[0,0,-1]]]){
+   const label=new THREE.Mesh(this.labelGeometry,faceLetter(letter));label.name='face-'+letter;label.position.set(...normal).multiplyScalar(1.52);label.quaternion.setFromUnitVectors(new THREE.Vector3(0,0,1),new THREE.Vector3(...normal));this.faceLabels.add(label);
+  }
+  canvas.dataset.faceLabels='R L U D F B';
   this.bodyMaterial=new THREE.MeshPhysicalMaterial({color:0x232925,roughness:.37,metalness:0,clearcoat:.3,clearcoatRoughness:.32,envMapIntensity:.24});
   this.tileMaterials=['#eabd49','#f1eee5','#dd7b95','#eaa36b','#62ab89','#6b9dc9'].map(color=>new THREE.MeshPhysicalMaterial({color,roughness:.25,metalness:0,clearcoat:.72,clearcoatRoughness:.22,envMapIntensity:.35}));
   this.groups=[];this.stickers=[];this.lastSignature='';this.size=0;this.axis=new THREE.Vector3();this.quaternion=new THREE.Quaternion();
