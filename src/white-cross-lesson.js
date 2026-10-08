@@ -1,7 +1,7 @@
 import {createCube,apply,parseAlg,move} from './cube.js';
 
-// A legal example with all four white edges outside the top layer.
-export const whiteCrossSetup="R U' R U R U R U' R' U' R2 F2 R2 B2 L2 U F R B L";
+// A legal example with no initial petals and an unfinished yellow cross after D is solved.
+export const whiteCrossSetup="F R U R' U' F' R U' R U R U R U' R' U' R2 F2 R2 B2 L2 U F R B L";
 export const whiteCrossInitial=apply(createCube(),parseAlg(whiteCrossSetup));
 const state=structuredClone(whiteCrossInitial);
 export const whiteCrossMoves=["L'","B'","R'","F'"];
@@ -24,7 +24,7 @@ for(const [face,normal,color]of specs){
  whiteCrossCheckpoints.push({index:whiteCrossMoves.length,type:'aligned',normal,sideColor});
  whiteCrossMoves.push(face+'2');move(state,face+'2');
  const count=state.filter(s=>s.c===1&&s.n[1]===-1&&s.p.filter(v=>v!==0).length===2).length;
- whiteCrossNotes.push('③ 送到底面 '+count+' / 4：'+color+'侧色已对齐中心，把这一面转半圈。'+(count===4?'四条白棱已围住白色中心，四个侧色也都对齐。现在翻看底面检查白十字。':'对其余白色花瓣重复“对齐侧色 → 转半圈”。'));
+ whiteCrossNotes.push('③ 送到底面 '+count+' / 4：'+color+'侧色已对齐中心，把这一面转半圈。'+(count===4?'底面白十字和四个侧色已对齐。顶面的黄十字还没完成，这一步先不用管。翻看底面检查。':'对其余白色花瓣重复“对齐侧色 → 转半圈”。'));
  whiteCrossCheckpoints.push({index:whiteCrossMoves.length,type:'sent',count});
 }
 export const whiteCrossAlgorithm=whiteCrossMoves.join(' ');

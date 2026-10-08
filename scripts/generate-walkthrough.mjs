@@ -7,13 +7,32 @@ const expected=new Map(createCube().map(s=>[s.n.join(','),s.c]));
 const describeMove=t=>({R:'右面',L:'左面',U:'顶面',D:'底面',F:'前面',B:'后面'})[t[0]]+(t.includes('2')?'转半圈':t.includes("'")?'逆时针转':'顺时针转')+'（'+t+'）';
 function add(alg,notes){const initial=structuredClone(state);apply(state,parseAlg(alg));chapters.push({initial,alg,notes,final:structuredClone(state)});console.log('Chapter',chapters.length,parseAlg(alg).length,'moves',layerScores(state));}
 add(whiteCrossAlgorithm,whiteCrossNotes);
+function yellowCrossPlan(initial){
+ const formula=parseAlg("F R U R' U' F'"),queue=[{state:structuredClone(initial),tokens:[],groups:0}];
+ for(let i=0;i<queue.length;i++){
+  const entry=queue[i],scores=layerScores(entry.state);if(scores[3]===4&&scores[4]<4&&scores[5]<4)return entry.tokens.join(' ');
+  if(entry.groups===3)continue;
+  for(const setup of [[],['U'],["U'"],['U2']]){
+   const tokens=[...setup,...formula],next=apply(structuredClone(entry.state),tokens);
+   if(!layerScores(next).slice(0,3).every(n=>n===4))throw Error('Yellow-cross formula broke the first two layers');
+   queue.push({state:next,tokens:[...entry.tokens,...tokens],groups:entry.groups+1});
+  }
+ }
+ throw Error('Beginner yellow-cross formula cannot solve this sample');
+}
 function targets(before,after,stage){const pieces=new Map();for(const s of after){if(stage===1?s.p[1]!==-1||s.p.filter(v=>v!==0).length!==3:s.p[1]!==0||s.p.filter(v=>v!==0).length!==2)continue;const key=s.p.join(',');if(!pieces.has(key))pieces.set(key,[]);pieces.get(key).push(s)}const names=[];for(const [key,piece]of pieces){if(!piece.every(s=>s.c===expected.get(s.n.join(','))))continue;if(before.filter(s=>s.p.join(',')===key).every(s=>s.c===expected.get(s.n.join(','))))continue;names.push(piece.map(s=>colors[s.c]).join('／')+(stage===1?'角块':'棱块'))}return names.join('、')}
 for(const stage of [1,2,3]){
  let alg=[],notes=[stage===1?'承接刚才的白十字：四条白棱已对齐中心，现在逐个放好白色角块。':stage===2?'第一层已经完成。寻找不含黄色的棱块，把它们放到两种中心颜色之间。':'前两层已经完成。现在只处理黄色棱块的朝向，让它们围住黄色中心。'];
  for(let round=0;layerScores(state)[stage]<4&&round<12;round++){
-  const match=await matchLayer(state,data);if(match.stage!==stage||!match.results.length)throw Error('Cannot continue stage '+stage);
+  const match=stage===3?{stage,results:[{alg:yellowCrossPlan(state)}]}:await matchLayer(state,data);if(match.stage!==stage||!match.results.length)throw Error('Cannot continue stage '+stage);
   const tokens=parseAlg(match.results[0].alg),before=structuredClone(state),after=apply(structuredClone(state),tokens),target=stage<3?targets(before,after,stage):'黄色棱块';
-  for(let i=0;i<tokens.length;i++){alg.push(tokens[i]);move(state,tokens[i]);notes.push(i===tokens.length-1?`这一组完成：${target}已归位，本阶段完成 ${layerScores(state)[stage]} / 4。`:`${target}：${describeMove(tokens[i])}。`)}
+  for(let i=0;i<tokens.length;i++){
+   alg.push(tokens[i]);move(state,tokens[i]);
+   if(stage===3&&tokens.slice(Math.max(0,i-5),i+1).join(' ')==="F R U R' U' F'"){
+    const edges=state.filter(s=>s.c===0&&s.n[1]===1&&s.p.filter(v=>v!==0).length===2),line=edges.length===2&&edges[0].p[0]===-edges[1].p[0]&&edges[0].p[2]===-edges[1].p[2];
+    notes.push(edges.length===4?'黄十字完成：四条黄棱朝上。白十字和前两层保持完成，黄角与顶层侧色留到后面。':`这一轮完成：黄棱形成${line?'一条线':'小拐角'}。前两层保持完成，摆好顶层方向，再重复同一组公式。`);
+   }else notes.push(i===tokens.length-1?`这一组完成：${target}已归位，本阶段完成 ${layerScores(state)[stage]} / 4。`:`${target}：${describeMove(tokens[i])}。`);
+  }
  }
  if(layerScores(state)[stage]!==4)throw Error('Incomplete stage');
  const initial=chapters.at(-1).final;chapters.push({initial:structuredClone(initial),alg:alg.join(' '),notes,final:structuredClone(state)});console.log('Chapter',chapters.length,alg.length,'moves',layerScores(state));
