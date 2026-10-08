@@ -16,7 +16,7 @@ function faceLetter(letter){
 export class CubeScene{
  constructor(canvas){
   this.canvas=canvas;this.renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true,powerPreference:'high-performance'});
-  this.renderer.setPixelRatio(Math.min(devicePixelRatio,2));this.renderer.outputColorSpace=THREE.SRGBColorSpace;this.renderer.toneMapping=THREE.ACESFilmicToneMapping;this.renderer.toneMappingExposure=.92;this.renderer.shadowMap.enabled=true;this.renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+  this.renderer.setPixelRatio(Math.min(devicePixelRatio,matchMedia('(pointer: coarse)').matches?1.5:2));this.renderer.outputColorSpace=THREE.SRGBColorSpace;this.renderer.toneMapping=THREE.ACESFilmicToneMapping;this.renderer.toneMappingExposure=.92;this.renderer.shadowMap.enabled=true;this.renderer.shadowMap.type=THREE.PCFShadowMap;
   this.scene=new THREE.Scene();this.camera=new THREE.PerspectiveCamera(32,1,.1,60);this.camera.position.set(5.2,4.2,6.5);
   this.controls=new OrbitControls(this.camera,canvas);this.controls.target.set(0,-.12,0);this.controls.enableDamping=true;this.controls.dampingFactor=.09;this.controls.enablePan=false;this.controls.minDistance=6;this.controls.maxDistance=14;this.controls.rotateSpeed=.38;this.controls.maxPolarAngle=Math.PI*.90;this.controls.update();
   // Broad reflections and a restrained specular response give satin plastic depth.

@@ -12,6 +12,14 @@ npm start
 
 打开 <http://127.0.0.1:4173/>。修改 `src/` 中的文件后刷新页面。
 
+## 手机演示与 PWA
+
+教程和公式演示支持展开查看、逐步播放及速度调节。手机竖屏采用大按钮，横屏展开时魔方和操作区分列显示。
+
+生产部署先运行 `npm run build`，将 `dist/` 或 Release 的 `dist.zip` 内容作为网站根目录，通过 HTTPS 访问。支持安装到桌面，首次加载并完成缓存后，游戏、公式库和教程可离线使用。Android 在浏览器允许安装时显示“安装”；iPhone/iPad 可在 Safari 的分享菜单中选择“添加到主屏幕”。新版本提示“更新并刷新”，不会自动打断当前操作。
+
+普通 localhost 开发不启用离线缓存。验证构建产物的 PWA：`npm run build` 后执行 `node scripts/preview.mjs --dist`，在地址后加 `?pwa=1`。先停止已占用 4173 端口的预览服务，或通过 `PORT` 环境变量使用另一个端口。图标可用 `node scripts/generate-icons.mjs` 重新生成。
+
 ## 检查与生成
 
 ```sh

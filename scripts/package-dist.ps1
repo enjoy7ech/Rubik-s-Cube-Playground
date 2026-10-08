@@ -19,7 +19,7 @@ Compress-Archive -LiteralPath $assets.FullName -DestinationPath $OutputPath -Com
 $archive = [IO.Compression.ZipFile]::OpenRead($OutputPath)
 try {
     $names = @($archive.Entries.FullName)
-    foreach ($required in @('index.html', 'tutorials.html', 'library.html', 'vendor/three.module.js', 'ALGORITHM-LICENSE.txt')) {
+    foreach ($required in @('index.html', 'tutorials.html', 'library.html', 'vendor/three.module.js', 'ALGORITHM-LICENSE.txt', 'sw.js', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/maskable-512.png')) {
         if ($names -notcontains $required) { throw "Required asset missing from archive: $required" }
     }
     if ($names | Where-Object { $_ -match '(^|/)(\.git|node_modules|\.openai)(/|$)' }) {
