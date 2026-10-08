@@ -1,5 +1,5 @@
-import {walkthrough} from '../dist/tutorial-walkthrough.js';
-import {apply,parseAlg} from '../dist/cube.js';
+import {walkthrough} from '../src/tutorial-walkthrough.js';
+import {apply,parseAlg} from '../src/cube.js';
 const before=walkthrough[2].initial,after=apply(structuredClone(before),parseAlg("U R U' R' U' F' U F"));
 const tile=(s,p,n)=>s.find(t=>t.p.join(',')===p.join(',')&&t.n.join(',')===n.join(',')).c;
 if(tile(before,[0,1,1],[0,1,0])!==2||tile(before,[0,1,1],[0,0,1])!==4)throw Error('Wrong green/pink source');

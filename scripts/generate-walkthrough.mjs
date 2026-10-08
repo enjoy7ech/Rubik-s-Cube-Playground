@@ -1,8 +1,8 @@
 import fs from 'node:fs';
-import {createCube,apply,parseAlg,move} from '../dist/cube.js';
-import {matchLayer,layerScores} from '../dist/layer-match.js';
-import {whiteCrossInitial,whiteCrossAlgorithm,whiteCrossNotes} from '../dist/white-cross-lesson.js';
-const data=JSON.parse(fs.readFileSync('dist/algs.json')),chapters=[],colors=['黄','白','粉','橙','绿','蓝'];let state=structuredClone(whiteCrossInitial);
+import {createCube,apply,parseAlg,move} from '../src/cube.js';
+import {matchLayer,layerScores} from '../src/layer-match.js';
+import {whiteCrossInitial,whiteCrossAlgorithm,whiteCrossNotes} from '../src/white-cross-lesson.js';
+const data=JSON.parse(fs.readFileSync('src/algs.json')),chapters=[],colors=['黄','白','粉','橙','绿','蓝'];let state=structuredClone(whiteCrossInitial);
 const expected=new Map(createCube().map(s=>[s.n.join(','),s.c]));
 const describeMove=t=>({R:'右面',L:'左面',U:'顶面',D:'底面',F:'前面',B:'后面'})[t[0]]+(t.includes('2')?'转半圈':t.includes("'")?'逆时针转':'顺时针转')+'（'+t+'）';
 function add(alg,notes){const initial=structuredClone(state);apply(state,parseAlg(alg));chapters.push({initial,alg,notes,final:structuredClone(state)});console.log('Chapter',chapters.length,parseAlg(alg).length,'moves',layerScores(state));}
@@ -41,4 +41,4 @@ for(let round=0;layerScores(state)[6]<4&&round<5;round++){const match=await matc
 lastNotes[lastNotes.length-1]='同一个打乱样例已经完整还原！检查六面都与各自中心同色。';chapters.push({initial:lastInitial,alg:last.join(' '),notes:lastNotes,final:structuredClone(state)});
 if(!state.every(s=>s.c===expected.get(s.n.join(','))))throw Error('Walkthrough not solved');
 for(let i=1;i<chapters.length;i++)if(JSON.stringify(chapters[i].initial)!==JSON.stringify(chapters[i-1].final))throw Error('Discontinuous chapters');
-fs.writeFileSync('dist/tutorial-walkthrough.js','export const walkthrough='+JSON.stringify(chapters)+';\n');console.log('Verified 7 continuous chapters from one legal mixed cube to solved.');
+fs.writeFileSync('src/tutorial-walkthrough.js','export const walkthrough='+JSON.stringify(chapters)+';\n');console.log('Verified 7 continuous chapters from one legal mixed cube to solved.');

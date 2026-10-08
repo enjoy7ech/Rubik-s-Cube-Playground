@@ -4,14 +4,14 @@
 
 推送任意 tag 时，检查通过后创建同名 GitHub Release，把 `dist.zip` 附在 Release 的 Assets 中。重复运行同一个 tag 会更新同名附件，不会重复创建 Release。使用内置 `GITHUB_TOKEN`，不需要添加个人访问令牌。
 
-先把工作流、`dist/`、`scripts/` 和 `tests/` 提交并推送到 GitHub，再推送指向该提交的 tag，例如：
+先把工作流、`src/`、`scripts/` 和 `tests/` 提交并推送到 GitHub，再推送指向该提交的 tag，例如：
 
 ```sh
 git tag v1.0.0
 git push origin v1.0.0
 ```
 
-项目是静态网站，发布时直接打包已提交的 `dist/`。如需重新生成教程样例，先在本地运行 `npm run generate` 并提交生成结果。CI 不部署 Sites。
+项目是静态网站，CI 执行 `npm run build`，从 `src/` 生成 `dist/` 后再打包。`dist/` 已被 Git 忽略，不提交到仓库。如需重新生成教程样例，先在本地运行 `npm run generate` 并提交生成结果。CI 不部署 Sites。
 
 `dist.zip` 解压后根目录直接包含 `index.html`，可用任意静态 HTTP 服务运行。压缩包包含本地 Three.js 与许可证，不包含 Git、依赖目录或 Sites 元数据。
 
@@ -20,5 +20,6 @@ git push origin v1.0.0
 ```sh
 npm run check
 npm test
+npm run build
 pwsh -File scripts/package-dist.ps1
 ```
