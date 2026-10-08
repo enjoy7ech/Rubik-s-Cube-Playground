@@ -29,9 +29,36 @@ export class CubeScene{
  update(state,size,animation){
   if(this.size!==size)this.rebuild(size);
   const signature=state.map(s=>[...s.p,...s.n,s.c].join(',')).join(';');
-  if(signature!==this.lastSignature){for(let i=0;i<state.length;i++){const s=state[i];let tile=this.stickers[i];if(!tile){tile=new THREE.Mesh(this.tileGeometry,this.tileMaterials[s.c]);tile.castShadow=true;tile.receiveShadow=true;this.stickers[i]=tile}tile.material=this.tileMaterials[s.c];tile.position.set(...s.n).multiplyScalar(.445);tile.quaternion.setFromUnitVectors(new THREE.Vector3(0,0,1),new THREE.Vector3(...s.n));tile.geometry=this.capGeometry(s,tile.quaternion,size);this.groupMap.get(s.p.join(',')).add(tile)}this.lastSignature=signature}
+  if(signature!==this.lastSignature){for(let i=0;i<state.length;i++){const s=state[i];let tile=this.stickers[i];if(!tile){tile=new THREE.Mesh(this.tileGeometry,this.tileMaterials[s.c]);tile.castShadow=true;tile.receiveShadow=true;this.stickers[i]=tile}tile.userData.sticker={p:[...s.p],n:[...s.n]};tile.material=this.tileMaterials[s.c];tile.position.set(...s.n).multiplyScalar(.445);tile.quaternion.setFromUnitVectors(new THREE.Vector3(0,0,1),new THREE.Vector3(...s.n));tile.geometry=this.capGeometry(s,tile.quaternion,size);this.groupMap.get(s.p.join(',')).add(tile)}this.lastSignature=signature}
   for(const group of this.groups){group.position.set(...group.userData.position);group.quaternion.identity();if(animation?.selected(group.userData.position)){this.axis.set(animation.axis===0?1:0,animation.axis===1?1:0,animation.axis===2?1:0);this.quaternion.setFromAxisAngle(this.axis,animation.angle);group.position.applyQuaternion(this.quaternion);group.quaternion.copy(this.quaternion)}}
  }
  capGeometry(sticker,quaternion,size){if(size!==3)return this.tileGeometry;const p=new THREE.Vector3(...sticker.p),localX=new THREE.Vector3(1,0,0).applyQuaternion(quaternion),localY=new THREE.Vector3(0,1,0).applyQuaternion(quaternion),x=Math.round(p.dot(localX)),y=Math.round(p.dot(localY));const key=x+','+y;if(this.geometryCache.has(key))return this.geometryCache.get(key);let radii=[.045,.045,.045,.045],width=.964;if(x===0&&y===0){radii=[.235,.235,.235,.235];width=.95}else for(const[i,[cx,cy]]of [[-1,-1],[1,-1],[1,1],[-1,1]].entries()){if((x===0||cx===-Math.sign(x))&&(y===0||cy===-Math.sign(y)))radii[i]=x===0||y===0?.185:.20}const geometry=roundedTile(width,radii);this.geometryCache.set(key,geometry);return geometry}
  resetView(){this.camera.position.set(5.2,4.2,6.5);this.controls.target.set(0,-.12,0);this.controls.update()}
+ enableLayerDrag({canTurn,onTurn,onPreview,onCancel}){
+  const canvas=this.canvas,ray=new THREE.Raycaster();let gesture=null;
+  const end=(commit=false)=>{if(!gesture)return;const g=gesture;gesture=null;this.controls.enabled=true;canvas.style.cursor='grab';if(canvas.hasPointerCapture(g.id))canvas.releasePointerCapture(g.id);if(commit&&g.token&&Math.abs(g.angle)>.1)onTurn(g.token,g.angle);else onCancel();};
+  canvas.addEventListener('pointerdown',e=>{
+   if(gesture){end();return}if(e.button!==0)return;
+   const r=canvas.getBoundingClientRect();ray.setFromCamera(new THREE.Vector2((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1),this.camera);
+   const hit=ray.intersectObjects(this.stickers,false)[0];if(!hit)return;
+   e.stopImmediatePropagation();e.preventDefault();if(!canTurn())return;
+   const sticker=hit.object.userData.sticker;if(!sticker)return;
+   this.controls.enabled=false;this.controls.update();canvas.setPointerCapture(e.pointerId);canvas.style.cursor='grabbing';
+   gesture={id:e.pointerId,x:e.clientX,y:e.clientY,p:[...sticker.p],n:[...sticker.n],token:null,angle:0};
+  },true);
+  canvas.addEventListener('pointermove',e=>{
+   if(!gesture||gesture.id!==e.pointerId)return;e.stopImmediatePropagation();
+   const g=gesture,dx=e.clientX-g.x,dy=e.clientY-g.y;if(!g.token&&Math.hypot(dx,dy)<10)return;
+   const r=canvas.getBoundingClientRect(),project=v=>{const p=v.clone().project(this.camera);return new THREE.Vector2(p.x*r.width/2,-p.y*r.height/2)};
+   if(!g.token){const normal=new THREE.Vector3(...g.n),origin=normal.clone().multiplyScalar(1.5),base=project(origin);let best=null;
+    for(let axis=0;axis<3;axis++){if(g.n[axis])continue;const a=new THREE.Vector3().setComponent(axis,1),tangent=a.clone().cross(normal),v=project(origin.clone().addScaledVector(tangent,.35)).sub(base).normalize(),dot=v.x*dx+v.y*dy;if(!best||Math.abs(dot)>Math.abs(best.dot))best={axis,v,dot};}
+    const m=(this.size-1)/2,layer=g.p[best.axis],face=['R','U','F'][best.axis],depth=Math.round(m-layer)+1,dir=best.dot>0?1:-1;
+    g.token=(depth===1?'':depth)+face+(dir===1?"'":'');g.direction=best.v.multiplyScalar(dir);g.dir=dir;
+   }
+   const distance=Math.max(0,dx*g.direction.x+dy*g.direction.y);g.angle=g.dir*Math.min(Math.PI*.48,distance/95*Math.PI/2);onPreview(g.token,g.angle);
+  },true);
+  canvas.addEventListener('pointerup',e=>{if(gesture?.id===e.pointerId){e.stopImmediatePropagation();end(true)}},true);
+  canvas.addEventListener('pointercancel',()=>end(),true);canvas.addEventListener('lostpointercapture',()=>end(),true);
+  this.cancelLayerDrag=()=>end();
+ }
 }
