@@ -1,6 +1,6 @@
-import {walkthrough} from './dist/tutorial-walkthrough.js';
-import {apply,parseAlg,createCube} from './dist/cube.js';
-import {layerScores} from './dist/layer-match.js';
+import {walkthrough} from '../dist/tutorial-walkthrough.js';
+import {apply,parseAlg,createCube} from '../dist/cube.js';
+import {layerScores} from '../dist/layer-match.js';
 const colors=new Map(createCube().map(s=>[s.n.join(','),s.c]));
 for(const [i,chapter]of walkthrough.entries()){
  const end=apply(structuredClone(chapter.initial),parseAlg(chapter.alg));

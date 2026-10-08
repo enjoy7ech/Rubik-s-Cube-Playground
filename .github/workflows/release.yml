@@ -31,14 +31,10 @@ jobs:
           package-manager-cache: false
 
       - name: Check JavaScript syntax
-        run: node scripts/check-js.mjs
+        run: npm run check
 
       - name: Verify cube and tutorial examples
-        run: |
-          npm test
-          node verify-white-cross.mjs
-          node verify-walkthrough.mjs
-          node verify-middle-diagram.mjs
+        run: npm test
 
       - name: Package dist.zip
         shell: pwsh

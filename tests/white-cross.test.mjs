@@ -1,5 +1,5 @@
-import {createCube,apply,parseAlg,move} from './dist/cube.js';
-import {whiteCrossInitial,whiteCrossMoves,whiteCrossCheckpoints} from './dist/white-cross-lesson.js';
+import {createCube,apply,parseAlg,move} from '../dist/cube.js';
+import {whiteCrossInitial,whiteCrossMoves,whiteCrossCheckpoints} from '../dist/white-cross-lesson.js';
 const state=structuredClone(whiteCrossInitial),petals=s=>s.filter(t=>t.c===1&&t.n[1]===1&&t.p.filter(v=>v!==0).length===2).length;
 if(petals(state)!==0)throw Error('Example already has petals');
 for(let i=0;i<whiteCrossMoves.length;i++){
