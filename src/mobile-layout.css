@@ -14,11 +14,17 @@
  .stage-background{inset:18px}
  .mobile-handbook-open .cloud-note,.mobile-handbook-open .paper-plane,.mobile-handbook-open .leaf-sprig,.mobile-handbook-open .tiny-rainbow,.mobile-handbook-open .mini-star,.mobile-handbook-open .mini-ring{display:none}
  body{padding-bottom:calc(58px + env(safe-area-inset-bottom))}
- .side-rail{inset:auto 0 0;width:100%;height:calc(58px + env(safe-area-inset-bottom));padding:0 12px env(safe-area-inset-bottom);border-right:0;border-top:1px solid #e1e7d5;z-index:40;background:#faf8f2}
+ .side-rail{inset:auto 0 0;width:100%;height:calc(58px + env(safe-area-inset-bottom));padding:0 12px env(safe-area-inset-bottom);border-right:0;border-top:1px solid #e3e7da;z-index:40;background:#fffdf7;box-shadow:0 -4px 16px #53634305}
  .side-rail .rail-brand,.side-rail .rail-bottom{display:none}
- .side-rail nav{display:flex;flex-direction:row;justify-content:space-around;gap:8px;width:100%;margin:0}
- .side-rail nav a{width:auto;flex:1;max-width:150px;padding:6px 8px;border-radius:12px;font-size:11px;gap:3px}
- .side-rail nav b{font-size:19px;line-height:20px}
+ .side-rail nav{display:flex;flex-direction:row;justify-content:space-around;gap:8px;width:100%;height:58px;margin:0}
+ .side-rail nav a{position:relative;width:auto;flex:1;max-width:none;min-height:54px;padding:6px 8px 10px;border-radius:0;font-size:11px;line-height:14px;gap:4px;justify-content:center;color:#8c9781;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+ .side-rail nav b{font-size:21px;line-height:22px;transition:transform .16s ease,color .16s ease}
+ .side-rail nav a.selected{background:transparent;color:#5d764b;font-weight:600}
+ .side-rail nav a.selected b{color:#6d8758;transform:translateY(-1px)}
+ .side-rail nav a.selected::after{display:block;content:'';position:absolute;width:12px;height:3px;bottom:3px;left:calc(50% - 6px);border-radius:3px;background:#b3c49b}
+ .side-rail nav a:hover{background:transparent;color:#6d8758}
+ .side-rail nav a:active b{transform:scale(.94)}
+ .side-rail nav a:focus-visible{outline:2px solid #a9bd90;outline-offset:-4px;border-radius:12px}
  .app-shell{margin-left:0}
  .app-header{height:calc(50px + env(safe-area-inset-top));padding:env(safe-area-inset-top) 16px 0}
  .app-name{font-size:19px}

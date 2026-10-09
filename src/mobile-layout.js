@@ -1,3 +1,4 @@
+document.querySelector('.side-rail nav a.selected')?.setAttribute('aria-current','page');
 const modes=document.querySelector('.game-modes');
 if(modes){
  const select=document.createElement('select');select.className='mobile-mode-select';select.setAttribute('aria-label','游戏模式');
