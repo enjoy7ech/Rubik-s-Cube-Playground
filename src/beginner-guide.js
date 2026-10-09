@@ -1,9 +1,9 @@
 import {apply,parseAlg} from './cube.js';
 import {layerScores} from './layer-match.js';
-import {yellowCrossStep} from './beginner-teaching.js';
+import {yellowCrossStep,cornerSetup} from './beginner-teaching.js';
 
-export const stageNames=['底面十字','底面角块','中层棱块','顶层十字','小鱼翻顶面','眼睛：角块归位','三棱换：最后还原'];
-export const fixedFormulas=[null,"R U R' U'","U R U' R' U' F' U F","F R U R' U' F'","R U R' U R U2 R'","R U R' U' R' F R2 U' R' U' R U R' F'","R2 U R U R' U' R' U' R' U R'"];
+export const stageNames=['底面十字','底面角块','中层棱块','顶层十字','小鱼翻顶面','短公式：角块归位','三棱换：最后还原'];
+export const fixedFormulas=[null,"R U R' U'","U R U' R' U' F' U F","F R U R' U' F'","R U R' U R U2 R'","R' F R' B2 R F' R' B2 R2","R2 U R U R' U' R' U' R' U R'"];
 export const leftInsert="U' L' U L U F U' F'";
 const order=[0,1,2,3,4,5,6],upSetups=[[],['U'],["U'"],['U2']],yawSetups=[[],['y'],['y2'],["y'"]];
 const orientations={D:[],U:['x2'],F:["x'"],B:['x'],R:['z'],L:["z'"]};
@@ -20,7 +20,6 @@ function macros(stage){
  return result.sort((a,b)=>a.tokens.length-b.tokens.length);
 }
 async function fixedPlan(initial,stage){
- if(stage===5)for(const preparation of upSetups.slice(1)){const aligned=apply(structuredClone(initial),preparation);if(layerScores(aligned)[5]===4)return[{preparation,formula:null,repeats:0,tokens:preparation,note:'四侧眼睛都已齐，只转顶层对齐中心，跳过角块置换。'}]}
  const pool=macros(stage),score=layerScores(initial)[order[stage]],maxDepth=stage===2?4:stage===3?3:2;
  const queue=[{state:initial,parts:[]}],seen=new Set([signature(initial)]);let checked=0;
  for(let head=0;head<queue.length;head++){
@@ -77,12 +76,18 @@ function fishStep(state){
  }
  throw Error('Cannot recognize this fish orientation');
 }
+function cornerStep(state){
+ const setup=cornerSetup(state),preparation=setup?.preparation||[];
+ if(setup?.complete)return[{preparation,formula:null,repeats:0,tokens:preparation,note:'四个角已经在正确的位置，只转 U 对齐中心，不做换角公式。'}];
+ const formula=fixedFormulas[5];
+ return[{preparation,formula,repeats:1,tokens:[...preparation,...parseAlg(formula)],note:setup?'先只转 U 找到只有一个角位置正确的摆法，再转整个魔方，把这个角放左前上。做一次短公式；若三个角仍没好，保持拿法再做一次。':'转 U 也暂时找不到只有一个正确角的摆法：先任意方向完整做一次短公式，再重新寻找。'}];
+}
 export async function guideNext(snapshot,baseFace='D'){
  const preparation=orientations[baseFace]||[],state=apply(structuredClone(snapshot),preparation),scores=layerScores(state);
  const stage=order.findIndex(index=>scores[index]<4);
  if(stage<0)return{stage:7,scores,results:[]};
  const cross=stage===3?yellowCrossStep(state):null;
- const parts=stage===0?await daisyPlan(state):stage===3?[{preparation:cross.preparation,formula:fixedFormulas[3],repeats:1,tokens:[...cross.preparation,...parseAlg(fixedFormulas[3])],note:'摆成示意图的方向，做一次完整公式，然后重新观察。'}]:stage===4?fishStep(state):await fixedPlan(state,stage);
+ const parts=stage===0?await daisyPlan(state):stage===3?[{preparation:cross.preparation,formula:fixedFormulas[3],repeats:1,tokens:[...cross.preparation,...parseAlg(fixedFormulas[3])],note:'摆成示意图的方向，做一次完整公式，然后重新观察。'}]:stage===4?fishStep(state):stage===5?cornerStep(state):await fixedPlan(state,stage);
  if(preparation.length)parts.unshift({preparation,formula:null,repeats:0,tokens:preparation,note:'先转整个魔方，把你选择的面放到底面 D。'});
  const tokens=parts.flatMap(part=>part.tokens),after=layerScores(apply(structuredClone(snapshot),tokens));
  return{stage,scores,teachingState:state,scoreIndex:order[stage],results:[{alg:tokens.join(' '),formula:stage===0?null:parts.find(p=>p.formula)?.formula||null,parts,after,gain:after[order[stage]]-scores[order[stage]],scoreIndex:order[stage]}]};

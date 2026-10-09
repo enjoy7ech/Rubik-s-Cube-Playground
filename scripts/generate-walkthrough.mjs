@@ -15,6 +15,12 @@ for(let stage=0;stage<7;stage++){
    notes[notes.length-1]=part.note||'这一轮做完，重新观察形态和位置。';
   }
  }
+ if(stage===6){
+  const originalCenters=new Map(whiteCrossInitial.filter(s=>s.p.filter(v=>v!==0).length===1).map(s=>[s.n.join(','),s.c]));
+  const alignment=[[],['y'],['y2'],["y'"]].find(tokens=>apply(structuredClone(state),tokens).filter(s=>s.p.filter(v=>v!==0).length===1).every(s=>s.c===originalCenters.get(s.n.join(','))));
+  if(!alignment)throw Error('Cannot restore sample viewing orientation');
+  for(const token of alignment){tokens.push(token);move(state,token);notes.push('最后把整个魔方转回开局方向（'+token+'），六面完成。')}
+ }
  if(layerScores(state)[stage]!==4)throw Error('Stage did not complete '+stage);
  if(!tokens.length)throw Error('Choose a sample that actually teaches every stage: '+stage);
  if(stage<3&&layerScores(state)[3]===4)throw Error('Sample accidentally finished the yellow cross early');
@@ -22,4 +28,4 @@ for(let stage=0;stage<7;stage++){
 }
 if(!layerScores(state).every(n=>n===4))throw Error('Not solved');
 fs.writeFileSync('src/tutorial-walkthrough.js','export const walkthrough='+JSON.stringify(chapters)+';\n');
-console.log('Verified the new seven-stage fish/headlights method from one scramble to solved.');
+console.log('Verified the seven-stage fish/short-corner-cycle method from one scramble to solved.');

@@ -11,7 +11,7 @@ for(const [i,chapter]of walkthrough.entries()){
  if(!checks.every(j=>s[j]===4))throw Error('Wrong stage goal '+i);
  if(i<3&&s[3]===4)throw Error('Yellow cross should remain unfinished before its own lesson');
  if(i===3&&(s[4]===4||s[5]===4))throw Error('Yellow-cross example must leave corner orientation and placement for later lessons');
- if(i===4&&s[5]===4)throw Error('Corner placement must remain for the headlights lesson');
+ if(i===4&&s[5]===4)throw Error('Corner placement must remain for the short corner-cycle lesson');
  if(!parseAlg(chapter.alg).length)throw Error('Every lesson needs an actual operation');
  console.log('Chapter',i+1,'continuous start, every move explained, stage goal verified');
 }

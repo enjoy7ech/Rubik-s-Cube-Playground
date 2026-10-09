@@ -36,6 +36,8 @@
 .formula-guide h3{font-size:18px;margin:0 0 12px;color:#526d43}
 .formula-guide .formula-main{font-size:20px;line-height:1.8;letter-spacing:.03em;padding:14px 18px;background:#fffdf6;border:1px solid #dee8d0;border-radius:12px;overflow-wrap:anywhere;margin:12px 0}
 .formula-purpose{font-size:14px;line-height:1.9;color:#708565}
+.formula-guide .formula-chunks{display:flex;flex-wrap:wrap;gap:10px;font-size:17px;padding:12px}
+.formula-chunks span{white-space:nowrap;background:#edf2e4;border-radius:8px;padding:4px 10px}
 .formula-guide ol{padding-left:23px;font-size:14px;line-height:1.9;margin-bottom:0}
 .formula-guide li{padding-left:5px;margin:12px 0}
 .formula-guide li::marker{color:#97aa85;font-weight:600}
@@ -83,3 +85,4 @@
 @media(max-width:750px){.method-cases{grid-template-columns:1fr}.pll-atlas{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:750px){.process-flow>.method-case:not(:last-child)::after{content:'↓';top:auto;right:calc(50% - 14px);bottom:-20px}}
 @media(max-width:600px){.tutorial-main{padding:20px 12px 30px}.tutorial-heading h1{font-size:23px}.tutorial-heading p,.course-intro{font-size:13px}.tutorial-methods button{font-size:13px;padding:10px 13px}.rewritten-lesson{padding:14px}.rewritten-lesson>summary{font-size:17px}.method-case{padding:14px}.method-case dl{font-size:13px}.method-cases{gap:10px}.lesson-index a{font-size:11px;padding:7px 9px}.pll-atlas{grid-template-columns:1fr}.pll-diagram svg{height:150px}.formula-guide{padding:14px}.formula-guide .formula-main{font-size:17px;padding:12px}.formula-guide ol,.formula-purpose{font-size:13px}}
+@media(max-width:600px){.formula-guide .formula-chunks{font-size:14px;gap:6px;padding:10px}.formula-chunks span{padding:4px 6px}}
