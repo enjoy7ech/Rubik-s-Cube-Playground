@@ -1,7 +1,7 @@
 {
   "id": "./",
-  "name": "方寸 · 魔方游乐场",
-  "short_name": "方寸魔方",
+  "name": "就转一下",
+  "short_name": "就转一下",
   "description": "可爱的三阶魔方游乐场，拖动游玩、公式演示与逐步教程。",
   "lang": "zh-CN",
   "start_url": "./index.html",

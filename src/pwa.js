@@ -7,7 +7,7 @@ if (enabled && window.isSecureContext && 'serviceWorker' in navigator && window 
   const install = document.createElement('button');
   install.className = 'outline pwa-install';
   install.textContent = '＋ 安装';
-  install.setAttribute('aria-label', '安装方寸魔方');
+  install.setAttribute('aria-label', '安装就转一下');
   install.hidden = true;
   document.querySelector('.header-right')?.prepend(install);
   let promptEvent;
@@ -30,7 +30,7 @@ if (enabled && window.isSecureContext && 'serviceWorker' in navigator && window 
     await promptEvent.userChoice;
     promptEvent = null; install.hidden = true;
   };
-  window.addEventListener('appinstalled', () => { install.hidden = true; toast('方寸已加入你的桌面 ♡'); });
+  window.addEventListener('appinstalled', () => { install.hidden = true; toast('就转一下已加入你的桌面 ♡'); });
   let requestedUpdate = false;
   navigator.serviceWorker.addEventListener('controllerchange', () => {
     if (requestedUpdate) location.reload();

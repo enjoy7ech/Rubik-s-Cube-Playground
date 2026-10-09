@@ -1,24 +1,24 @@
-// Rasterize the site's simple cube mark without external dependencies.
+// One code-native cube-and-turn mark for SVG, PNG, maskable icons and ICO.
 import {mkdirSync,writeFileSync} from 'node:fs';
 import {deflateSync} from 'node:zlib';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
-const directory=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'../src/icons');
-mkdirSync(directory,{recursive:true});
+const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'../src'),directory=path.join(root,'icons');mkdirSync(directory,{recursive:true});
 const crc=buffer=>{let value=0xffffffff;for(const byte of buffer){value^=byte;for(let i=0;i<8;i++)value=(value>>>1)^((value&1)?0xedb88320:0)}return(value^0xffffffff)>>>0};
 function chunk(type,data){const name=Buffer.from(type),size=Buffer.alloc(4),checksum=Buffer.alloc(4);size.writeUInt32BE(data.length);checksum.writeUInt32BE(crc(Buffer.concat([name,data])));return Buffer.concat([size,name,data,checksum])}
-const faces=[
- {points:[[.5,.24],[.76,.39],[.5,.54],[.24,.39]],color:[155,183,132]},
- {points:[[.24,.39],[.5,.54],[.5,.84],[.24,.69]],color:[238,197,129]},
- {points:[[.5,.54],[.76,.39],[.76,.69],[.5,.84]],color:[219,155,173]}
-];
-function inside(x,y,points){let hit=false;for(let i=0,j=points.length-1;i<points.length;j=i++){const [a,b]=points[i],[c,d]=points[j];if((b>y)!==(d>y)&&x<(c-a)*(y-b)/(d-b)+a)hit=!hit}return hit}
-function point(points,u,v){return [0,1].map(axis=>points[0][axis]*(1-u)*(1-v)+points[1][axis]*u*(1-v)+points[2][axis]*u*v+points[3][axis]*(1-u)*v)}
-const tiles=faces.flatMap(face=>Array.from({length:9},(_,i)=>{const col=i%3,row=Math.floor(i/3),gap=.019,u=col/3+gap,v=row/3+gap,endU=(col+1)/3-gap,endV=(row+1)/3-gap;return{points:[point(face.points,u,v),point(face.points,endU,v),point(face.points,endU,endV),point(face.points,u,endV)],color:face.color}}));
-for(const size of [180,192,512]){
- const bytes=Buffer.alloc((size*4+1)*size);for(let y=0;y<size;y++){const offset=y*(size*4+1);for(let x=0;x<size;x++){const color=[0,0,0];for(let sy=0;sy<2;sy++)for(let sx=0;sx<2;sx++){const tile=tiles.find(tile=>inside((x+(sx+.5)/2)/size,(y+(sy+.5)/2)/size,tile.points));const sample=tile?.color||[250,248,242];for(let c=0;c<3;c++)color[c]+=sample[c]/4}for(let c=0;c<3;c++)bytes[offset+1+x*4+c]=Math.round(color[c]);bytes[offset+1+x*4+3]=255}}
- const header=Buffer.alloc(13);header.writeUInt32BE(size,0);header.writeUInt32BE(size,4);header[8]=8;header[9]=6;
- const png=Buffer.concat([Buffer.from([137,80,78,71,13,10,26,10]),chunk('IHDR',header),chunk('IDAT',deflateSync(bytes)),chunk('IEND',Buffer.alloc(0))]);
- writeFileSync(path.join(directory,`icon-${size}.png`),png);if(size===512)writeFileSync(path.join(directory,'maskable-512.png'),png);
-}
-console.log('Generated PWA cube icons.');
+const faces=[{points:[[.5,.34],[.77,.49],[.5,.64],[.23,.49]],color:[244,215,132]},{points:[[.23,.49],[.5,.64],[.5,.83],[.23,.68]],color:[164,204,171]},{points:[[.5,.64],[.77,.49],[.77,.68],[.5,.83]],color:[225,158,175]}];
+const interpolate=(a,b,t)=>a.map((v,i)=>v*(1-t)+b[i]*t),point=(p,u,v)=>p[0].map((n,i)=>n+(p[1][i]-n)*u+(p[3][i]-n)*v);
+const tiles=faces.flatMap(face=>Array.from({length:9},(_,i)=>{const col=i%3,row=Math.floor(i/3),gap=.012,u=col/3+gap,v=row/3+gap,endU=(col+1)/3-gap,endV=(row+1)/3-gap;return{points:[point(face.points,u,v),point(face.points,endU,v),point(face.points,endU,endV),point(face.points,u,endV)],color:face.color}}));
+function insideTile(x,y,p){const ax=p[1][0]-p[0][0],ay=p[1][1]-p[0][1],bx=p[3][0]-p[0][0],by=p[3][1]-p[0][1],det=ax*by-ay*bx,dx=x-p[0][0],dy=y-p[0][1],u=(dx*by-dy*bx)/det,v=(dy*ax-dx*ay)/det;if(u<0||v<0||u>1||v>1)return false;const r=.13,cx=Math.max(r,Math.min(1-r,u)),cy=Math.max(r,Math.min(1-r,v));return(u-cx)**2+(v-cy)**2<=r*r}
+const head=[[.805,.324],[.717,.292],[.8,.245]];
+function triangle(x,y,p){const signs=p.map((a,i)=>{const b=p[(i+1)%3];return(x-a[0])*(b[1]-a[1])-(y-a[1])*(b[0]-a[0])});return signs.every(n=>n>=0)||signs.every(n=>n<=0)}
+function arrow(x,y){const dx=x-.5,dy=y-.43,angle=Math.atan2(dy,dx);return(angle>=-160*Math.PI/180&&angle<=-30*Math.PI/180&&Math.abs(Math.hypot(dx,dy)-.31)<.015)||triangle(x,y,head)}
+function colorAt(x,y){if(arrow(x,y))return[112,144,95];return tiles.find(t=>insideTile(x,y,t.points))?.color||[250,248,242]}
+function raster(size){const bytes=Buffer.alloc((size*4+1)*size),samples=size<=48?4:2;for(let y=0;y<size;y++)for(let x=0;x<size;x++){const color=[0,0,0];for(let sy=0;sy<samples;sy++)for(let sx=0;sx<samples;sx++){const sample=colorAt((x+(sx+.5)/samples)/size,(y+(sy+.5)/samples)/size);for(let c=0;c<3;c++)color[c]+=sample[c]/(samples*samples)}const offset=y*(size*4+1)+1+x*4;for(let c=0;c<3;c++)bytes[offset+c]=Math.round(color[c]);bytes[offset+3]=255}const header=Buffer.alloc(13);header.writeUInt32BE(size,0);header.writeUInt32BE(size,4);header[8]=8;header[9]=6;return Buffer.concat([Buffer.from([137,80,78,71,13,10,26,10]),chunk('IHDR',header),chunk('IDAT',deflateSync(bytes)),chunk('IEND',Buffer.alloc(0))])}
+const pngs=new Map();for(const size of [16,32,48,180,192,512]){const png=raster(size);pngs.set(size,png);writeFileSync(path.join(directory,`icon-${size}.png`),png);if(size===512)writeFileSync(path.join(directory,'maskable-512.png'),png)}
+const size=512,xy=p=>p.map(v=>(v*size).toFixed(2)).join(' ');
+function roundedPath(points){let d='M '+xy(interpolate(points[0],points[3],.13));for(let i=0;i<4;i++){d+=' Q '+xy(points[i])+' '+xy(interpolate(points[i],points[(i+1)%4],.13))+' L '+xy(interpolate(points[(i+1)%4],points[i],.13))}return d+' Z'}
+const svg=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><title>就转一下</title><rect width="512" height="512" rx="112" fill="#faf8f2"/>${tiles.map(t=>`<path d="${roundedPath(t.points)}" fill="rgb(${t.color.join(',')})"/>`).join('')}<path d="M ${xy([.5+.31*Math.cos(-160*Math.PI/180),.43+.31*Math.sin(-160*Math.PI/180)])} A ${size*.31} ${size*.31} 0 0 1 ${xy([.5+.31*Math.cos(-30*Math.PI/180),.43+.31*Math.sin(-30*Math.PI/180)])}" fill="none" stroke="#70905f" stroke-width="15.36" stroke-linecap="round"/><path d="M ${head.map(xy).join(' L ')} Z" fill="#70905f"/></svg>`;
+writeFileSync(path.join(directory,'brand.svg'),svg);writeFileSync(path.join(root,'favicon.svg'),svg);
+const images=[16,32,48].map(n=>pngs.get(n)),header=Buffer.alloc(6+16*images.length);header.writeUInt16LE(1,2);header.writeUInt16LE(images.length,4);let offset=header.length;images.forEach((png,i)=>{const at=6+16*i,n=[16,32,48][i];header[at]=header[at+1]=n;header.writeUInt16LE(1,at+4);header.writeUInt16LE(32,at+6);header.writeUInt32LE(png.length,at+8);header.writeUInt32LE(offset,at+12);offset+=png.length});writeFileSync(path.join(root,'favicon.ico'),Buffer.concat([header,...images]));
+console.log('Generated 就转一下 SVG mark, 6 PNG sizes, maskable icon and multi-size favicon.ico.');

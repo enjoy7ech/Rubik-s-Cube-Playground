@@ -11,11 +11,12 @@ const dialog=$('#courseDialog');
 dialog.querySelector('.close').innerHTML=$('#helpDialog .close').innerHTML;
 dialog.addEventListener('close',()=>{generation++;pauseLessonDemo();document.documentElement.classList.remove('tutorial-dialog-open')});
 const titles={beginner:'基础教程 · 七步还原',cfop:advancedCourses.cfop.title,roux:advancedCourses.roux.title,pll:'PLL · 21 种置换图鉴'};
-async function showCourse(key){
+export function pauseCourse(){pauseLessonDemo();generation++}
+export async function showCourse(key){
  const version=++generation;
  pauseLessonDemo();$('#courseTitle').textContent=titles[key];
  const content=$('#courseContent');content.replaceChildren();
- if(!dialog.open)dialog.showModal();document.documentElement.classList.add('tutorial-dialog-open');dialog.querySelector('.course-dialog-body').scrollTop=0;
+ if(!dialog.open){if(document.body.classList.contains('game-page'))dialog.show();else dialog.showModal()}if(!document.body.classList.contains('game-page'))document.documentElement.classList.add('tutorial-dialog-open');dialog.querySelector('.course-dialog-body').scrollTop=0;
  if(key==='beginner'){
   const intro=document.createElement('p');intro.className='course-intro';intro.textContent='白色朝下，黄色朝上。每课围绕一条基础公式：它做什么 → 怎么摆 → 重复到什么时候。摆放图需要时再展开；每课下方的三维演示接着同一局样例，一直拼到完成。';content.append(intro);
   const index=document.createElement('nav');index.className='lesson-index';index.setAttribute('aria-label','七步学习目录');
@@ -24,7 +25,7 @@ async function showCourse(key){
    const lesson=document.createElement('details');lesson.className='lesson rewritten-lesson';lesson.id='lesson-'+i;lesson.open=i===0;
    const summary=document.createElement('summary');summary.textContent=String(i+1).padStart(2,'0')+' / '+entry.title;lesson.append(summary);
    renderLesson(lesson,i,{caseDemo:(card,example)=>addLessonDemo(card,example.alg,example.name,'case',0,example.sample())});addLessonDemo(lesson,walkthrough[i].alg,entry.title,'beginner',i);
-   const game=document.createElement('a');game.className='outline button small';game.textContent='把本课样例带到游戏中';game.href='index.html?alg='+encodeURIComponent(walkthrough[i].alg)+'&setupAlg='+encodeURIComponent(whiteCrossSetup+' '+walkthrough.slice(0,i).map(c=>c.alg).join(' '))+'&case='+encodeURIComponent(entry.title);lesson.append(game);
+   const game=document.createElement('a');game.className='outline button small';game.textContent=document.body.classList.contains('game-page')?'在新标签练习本课样例':'把本课样例带到游戏中';game.href='index.html?alg='+encodeURIComponent(walkthrough[i].alg)+'&setupAlg='+encodeURIComponent(whiteCrossSetup+' '+walkthrough.slice(0,i).map(c=>c.alg).join(' '))+'&case='+encodeURIComponent(entry.title);lesson.append(game);
    const label=document.createElement('label');label.className='lesson-complete';const check=document.createElement('input');check.type='checkbox';check.checked=!!progress[i];check.onchange=()=>{progress[i]=check.checked;storage.set('method-v3-progress',progress);if(check.checked)toast('这一课学会啦 ♡')};label.append(check,document.createTextNode('这一步我学会了'));lesson.append(label);content.append(lesson);
   });
  }else if(advancedCourses[key]){
@@ -48,4 +49,4 @@ async function showCourse(key){
  }
  const note=document.createElement('p');note.className='tutorial-source';note.innerHTML='记号：R 右、U 顶、F 前；撇号是逆时针，2 是半圈。小写字母／w 是双层，M/E/S 是中层，x/y/z 是整体。顺逆时针从正对该面判断。'+(key==='beginner'?'<br>入门步骤参考 <a href="https://rubiks.com/solve-guide" target="_blank" rel="noopener">Rubik’s 官方指南</a>；图形由实际魔方状态绘制，公式与动画逐条校验。':'');content.append(note);
 }
-$$('[data-course]').forEach(button=>button.onclick=()=>showCourse(button.dataset.course));
+if(!document.body.classList.contains('game-page'))$$('[data-course]').forEach(button=>button.onclick=()=>showCourse(button.dataset.course));

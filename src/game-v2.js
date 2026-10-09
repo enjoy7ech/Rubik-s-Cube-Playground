@@ -1,5 +1,6 @@
 import {initCurrentCase} from './current-case.js';
 import {initStageBackground} from './stage-background.js';
+import {initGameOverlays} from './game-overlays.js';
 import {CubeScene} from './cube-scene.js';
 import {createCube,parseAlg,inverse,move,movePlan,apply,drawCube} from './cube.js';
 import {$,$$,storage,toast} from './common.js';
@@ -71,3 +72,4 @@ window.addEventListener('resize',()=>{if(!handbook.open)return;const rect=handbo
 initStageBackground(document.querySelector('.cube-viewport'));
 
 initCurrentCase({getSnapshot:()=>({state:cubeScene.stateInView(state),size}),canRead:()=>!processing&&!canvas.dataset.dragMove,toast,applySteps:(snapshot,alg,onDone)=>{if(processing||JSON.stringify(snapshot)!==JSON.stringify(cubeScene.stateInView(state))){toast('魔方或观察方向已经变化，请重新读取当前局面');return false}clearSequence();if(currentMode==='timer'&&hasScrambled&&!running&&!timerStartedForRound)startTimer();const tokens=parseAlg(alg).map(t=>cubeScene.toWorldToken(t));tokens.forEach((token,i)=>queueTurn(token,()=>{history.push(token);if(i===tokens.length-1)onDone()}));return true}});
+initGameOverlays();

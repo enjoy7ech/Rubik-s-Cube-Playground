@@ -1,0 +1,8 @@
+.rail-brand{background:transparent;display:grid;place-items:center;line-height:1}
+.rail-brand img{display:block;width:100%;height:100%;border-radius:inherit}
+.app-name{letter-spacing:.02em;display:inline-flex;align-items:center;gap:9px}
+.app-brand-mark{display:block;width:30px;height:30px;border-radius:9px}
+.app-name span{margin-left:0}
+@media(max-width:600px){.app-name{gap:7px}.app-brand-mark{width:26px;height:26px}}
+.small-mascot{font-size:0!important;background:url('icons/brand.svg') center / contain no-repeat!important;border:0!important;transform:none!important}
+.small-mascot span{display:none}

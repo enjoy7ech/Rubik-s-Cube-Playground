@@ -2,8 +2,10 @@ import assert from 'node:assert/strict';
 import {readFileSync,readdirSync} from 'node:fs';
 import vm from 'node:vm';
 const manifest=JSON.parse(readFileSync('src/manifest.webmanifest','utf8'));
+assert.equal(manifest.name,'就转一下');assert.equal(manifest.short_name,'就转一下');
 for(const icon of manifest.icons){const bytes=readFileSync('src/'+icon.src),size=icon.sizes.split('x').map(Number);assert.equal(bytes.readUInt32BE(16),size[0]);assert.equal(bytes.readUInt32BE(20),size[1])}
-for(const page of ['index','library','tutorials']){const html=readFileSync('src/'+page+'.html','utf8');assert.ok(html.includes('rel="manifest"'));assert.ok(html.includes('src="pwa.js"'))}
+for(const page of ['index','library','tutorials']){const html=readFileSync('src/'+page+'.html','utf8');assert.ok(html.includes('rel="manifest"'));assert.ok(html.includes('src="pwa.js"'));assert.ok(html.includes('href="favicon.svg"'));assert.ok(html.includes('href="favicon.ico"'));assert.ok(html.includes('就转一下'));assert.ok(!html.includes('方寸'))}
+const ico=readFileSync('src/favicon.ico');assert.equal(ico.readUInt16LE(2),1);assert.equal(ico.readUInt16LE(4),3);for(let i=0;i<3;i++){const at=6+16*i,size=[16,32,48][i],offset=ico.readUInt32LE(at+12);assert.equal(ico[at],size);assert.equal(ico.readUInt32BE(offset+16),size);assert.equal(ico.readUInt32BE(offset+20),size)}
 const assets=readdirSync('src',{recursive:true,withFileTypes:true}).filter(file=>file.isFile()).map(file=>file.name);
 assert.ok(assets.includes('three.module.js'));
 const handlers={},stores=new Map();let claimed=false,skipped=false;
