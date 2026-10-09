@@ -1,10 +1,9 @@
 import {apply,parseAlg} from './cube.js';
 import {layerScores} from './layer-match.js';
 import {yellowCrossStep,cornerSetup} from './beginner-teaching.js';
-import {algorithms} from './tutorial-content.js';
 
-export const stageNames=['底面十字','底面角块','中层棱块','顶层十字','小鱼翻顶面','短公式：角块归位','双小鱼：最后换棱'];
-export const fixedFormulas=[null,algorithms.trigger,algorithms.right,algorithms.cross,algorithms.fish1,algorithms.corners,algorithms.edges];
+export const stageNames=['底面十字','底面角块','中层棱块','顶层十字','小鱼翻顶面','短公式：角块归位','三棱换：最后还原'];
+export const fixedFormulas=[null,"R U R' U'","U R U' R' U' F' U F","F R U R' U' F'","R U R' U R U2 R'","R' F R' B2 R F' R' B2 R2","R2 U R U R' U' R' U' R' U R'"];
 export const leftInsert="U' L' U L U F U' F'";
 const order=[0,1,2,3,4,5,6],upSetups=[[],['U'],["U'"],['U2']],yawSetups=[[],['y'],['y2'],["y'"]];
 const orientations={D:[],U:['x2'],F:["x'"],B:['x'],R:['z'],L:["z'"]};
@@ -16,7 +15,7 @@ function macros(stage){
  const formulas=stage===2?[fixedFormulas[2],leftInsert]:[fixedFormulas[stage]],result=[];
  for(const formula of formulas)for(const yaw of yawSetups)for(const setup of stage===6?[[]]:upSetups)for(let repeats=1;repeats<=(stage===1?5:stage===5||stage===6?2:1);repeats++){
   const preparation=[...yaw,...setup],tokens=[...preparation,...Array.from({length:repeats},()=>parseAlg(formula)).flat()];
-  result.push({preparation,formula,repeats,tokens,...(stage===6?{note:'完整面放在 B：右小鱼 → U → 左小鱼 → U′，连起来做，中途不换拿法。做完一组再观察；需要时重复同一组。'}:{})});
+  result.push({preparation,formula,repeats,tokens});
  }
  return result.sort((a,b)=>a.tokens.length-b.tokens.length);
 }

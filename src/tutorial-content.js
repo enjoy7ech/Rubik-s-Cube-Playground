@@ -1,6 +1,5 @@
 import {sampleFor,topView,stripView,crossBottom,daisyExample,whiteCrossFinalExample,insertionDiagram,fishConversionExample,cornerCheck,cornerConversionExample} from './tutorial-diagrams.js';
-export const algorithms={trigger:"R U R' U'",right:"U R U' R' U' F' U F",left:"U' L' U L U F U' F'",cross:"F R U R' U' F'",fish1:"R U R' U R U2 R'",fish2:"R U2 R' U' R U' R'",fishLeft:"L' U' L U' L' U2 L",corners:"R' F R' B2 R F' R' B2 R2",eyes:"R U R' U' R' F R2 U' R' U' R U R' F'"};
-algorithms.edges=algorithms.fish1+" U "+algorithms.fishLeft+" U'";
+export const algorithms={trigger:"R U R' U'",right:"U R U' R' U' F' U F",left:"U' L' U L U F U' F'",cross:"F R U R' U' F'",fish1:"R U R' U R U2 R'",fish2:"R U2 R' U' R U' R'",corners:"R' F R' B2 R F' R' B2 R2",eyes:"R U R' U' R' F R2 U' R' U' R U R' F'",edges:"R2 U R U R' U' R' U' R' U R'"};
 const c=(name,look,hold,act,then,alg=null,diagram=null)=>({name,look,hold,act,then,alg,diagram});
 export const lessons=[
  {title:'白色十字',goal:'把四条白棱放到底面，侧色对齐中心。',check:'底面白十字，四个侧面出现同色的“中心＋底棱”。',cases:[
@@ -25,10 +24,10 @@ export const lessons=[
  {title:'短换角公式 · 角块归位',goal:'只记 9 步：固定一个正确角，循环交换另外三个角，黄色顶面保留。',check:'四个顶角的两侧颜色都对齐各自中心；中间棱块暂时不管。',cases:[
   c('只有一个角位置正确','先只转 U，找到只有一个角的两侧颜色都对齐中心的摆法，其余三个角都错。','转整个魔方，把这颗正确角放在左前上。','完整做一次短公式；若没好，保持同一拿法再做一次。','三角依次换位，顶面仍全黄。',algorithms.corners,()=>cornerCheck(sampleFor(algorithms.corners))),
   c('暂时找不到这种摆法','试过 U / U′ / U2，仍找不到“只有一个正确角”，也无法直接把四角都对齐。','黄色在上，任意侧面朝前。','先做一次短公式，再转 U 寻找只有一个正确角的摆法。','找到后把正确角放左前上，继续同一条公式。',algorithms.corners,()=>cornerCheck(cornerConversionExample(algorithms.corners))),
-  c('四个角位置都正确','只转 U，就能让四颗顶角的两侧颜色全部对齐中心。','把顶层对齐即可。','不做换角公式，直接进入双小鱼换棱。','角块完成，下一步处理棱块。',null,()=>stripView(sampleFor('U')))]},
- {title:'双小鱼 · 最后换棱',goal:'复用右小鱼，再做镜像的左小鱼，交换顶层三条棱。角块位置保留。',check:'六个面都与中心同色。',cases:[
-  c('有一个完整侧面','四个顶角已归位，一侧整面与中心同色。','把完整侧面放在后面 B，黄色朝上。','右小鱼 → U → 左小鱼 → U′，四段连起来做，中间不转整个魔方。','还没完成？保持拿法，再完整做一组。',algorithms.edges,()=>stripView(sampleFor(algorithms.edges),'B')),
-  c('没有完整侧面','角块已好，但四个侧面的中间棱都不对。','黄色在上，任意侧面朝前。','先完整做一组双小鱼，再找已经拼好的侧面。','把完整面放到后面，继续同一组动作。',algorithms.edges)]}
+  c('四个角位置都正确','只转 U，就能让四颗顶角的两侧颜色全部对齐中心。','把顶层对齐即可。','不做换角公式，直接进入三棱换。','角块完成，下一步处理棱块。',null,()=>stripView(sampleFor('U')))]},
+ {title:'三棱换公式 · 最后还原',goal:'角块不动，交换最后几条顶层棱。',check:'六个面都与中心同色。',cases:[
+  c('有一个完整侧面','一侧的顶排三块都与中心同色，整面已拼好。','把完整侧面放在后面 B。','做三棱换公式。若方向相反，再完整做一次。','最后转 U 对齐，六面完成。',algorithms.edges,()=>stripView(sampleFor(algorithms.edges),'B')),
+  c('没有完整侧面','角块已好，但四个侧面的中间棱都不对。','黄色在上，任意方向开始。','先做一次三棱换，再找已经拼好的侧面。','把完整面放到后面，继续同一公式。',algorithms.edges)]}
 ];
 lessons[1].cases[0].sample=()=>sampleFor(algorithms.trigger);
 lessons[2].cases[0].sample=()=>sampleFor(algorithms.right);
@@ -49,16 +48,15 @@ const formulaLessons=[
  {name:'造十字公式',formula:algorithms.cross,use:'翻转顶层棱块，让四条黄棱朝上。前两层会保留。',steps:['黄色在上。点形任意拿；小拐角放左上；一字线横着放。','完整做一次公式，再看顶面。按“点 → 小拐角 → 一字线 → 十字”前进。','每次只重新摆方向，公式一直相同；看到黄十字就停。']},
  {name:'小鱼公式',formula:algorithms.fish1,use:'翻转顶层角块，把黄十字变成全黄顶面。黄十字和前两层会保留。',steps:['黄色在上，先数朝上的黄角：1 个，把鱼头放左下；0 个，让左前上角的黄贴朝左；2 个，让它朝前。','完整做一次这七步。还没全黄？重新按上一条摆好，再做同一公式。','最多三轮就能翻满顶面。每轮都要重新观察、摆放；全黄立即停。']},
  {name:'短换角 · 只记 9 步',formula:algorithms.corners,chunks:["R' F R'","B2 R F'","R' B2 R2"],use:'固定一颗角，循环交换另外三颗。只用 R、F、B，不会翻乱黄色顶面；三组连起来做。',steps:['先只转 U，找“只有一个角位置正确”的摆法：这颗角的两侧颜色都对齐中心，其余三角都错。四角已全对就跳过本课。','转整个魔方，把正确角放左前上，完整做 9 步。若没好，保持同一拿法再完整做一次。','试过 U 仍找不到这种摆法？先任意拿着完整做一次，再回到第 1 条找正确角。']},
- {name:'双小鱼 · 不再背一条三棱换',formula:algorithms.edges,segments:[['① 右小鱼 · 已经学过',algorithms.fish1],['② 顶层转一下','U'],['③ 左小鱼 · 右小鱼的镜像',algorithms.fishLeft],['④ 顶层转回来',"U'"]],use:'左手照着右小鱼反方向做：R 换成 L′，U 换成 U′。记住“右小鱼 → U → 左小鱼 → U′”，就能移动三条顶棱；做完一整组，黄顶和角块都会恢复。',steps:['先确认顶面全黄、四个顶角都已对齐。把完整侧面放在后面 B；没有完整面，就任意方向先做一组，再找完整面。','保持同一拿法，按下面四段连续做。右小鱼后顶面会暂时变乱，别停下来重新找鱼头，也别转整个魔方。','一整组做完再检查。没完成就保持完整面在后面，重复同一组；六面同色就停。']}
+ {name:'三棱换公式',formula:algorithms.edges,use:'保留已经归位的角块，只交换三条顶层棱。',steps:['把拼好的完整侧面放在后面 B。没有完整面？先任意拿着做一次，再找完整面。','完整做一次；还没还原，就保持完整面在后面，再做一次同样的公式。','六面都同色就停。别在中间拆开公式执行。']}
 ];
 export function renderLesson(container,index,{compact=false,caseDemo=null}={}){
  const lesson=lessons[index],section=document.createElement('section');section.className='method-lesson';
  const method=formulaLessons[index],hero=document.createElement('div');hero.className='formula-guide';
  const name=document.createElement('h3');name.textContent=method.name;hero.append(name);
- if(method.formula&&!compact&&!method.segments){const formula=document.createElement('p');formula.className='formula formula-main';if(method.chunks){formula.classList.add('formula-chunks');for(const chunk of method.chunks){const span=document.createElement('span');span.textContent=chunk+' ';formula.append(span)}}else formula.textContent=method.formula;hero.append(formula)}
+ if(method.formula&&!compact){const formula=document.createElement('p');formula.className='formula formula-main';if(method.chunks){formula.classList.add('formula-chunks');for(const chunk of method.chunks){const span=document.createElement('span');span.textContent=chunk+' ';formula.append(span)}}else formula.textContent=method.formula;hero.append(formula)}
  const purpose=document.createElement('p');purpose.className='formula-purpose';purpose.textContent=method.use;hero.append(purpose);
  const steps=document.createElement('ol');for(const text of method.steps){const item=document.createElement('li');item.textContent=text;steps.append(item)}hero.append(steps);
- if(method.segments&&!compact){const sequence=document.createElement('div');sequence.className='fish-sequence';for(const [label,alg]of method.segments){const part=document.createElement('div'),title=document.createElement('strong'),code=document.createElement('p');title.textContent=label;code.className='formula';code.textContent=alg;part.append(title,code);sequence.append(part)}hero.append(sequence)}
  if(method.extra){const extra=document.createElement('details'),summary=document.createElement('summary'),code=document.createElement('p'),text=document.createElement('p');extra.className='formula-extra';summary.textContent=method.extra.name;code.className='formula';code.textContent=method.extra.formula;text.textContent=method.extra.text;extra.append(summary,code,text);hero.append(extra)}
  section.append(hero);
  const grid=document.createElement('div');grid.className='method-cases'+(index===3?' process-flow':'');
