@@ -17,7 +17,7 @@ async function showCourse(key){
  const content=$('#courseContent');content.replaceChildren();
  if(!dialog.open)dialog.showModal();document.documentElement.classList.add('tutorial-dialog-open');dialog.querySelector('.course-dialog-body').scrollTop=0;
  if(key==='beginner'){
-  const intro=document.createElement('p');intro.className='course-intro';intro.textContent='白色朝下，黄色朝上。每课围绕一条基础公式：它做什么 → 怎么摆 → 重复到什么时候。摆放图需要时再展开；每课下方的三维演示接着同一局样例，一直拼到完成。';content.append(intro);
+  const intro=document.createElement('p');intro.className='course-intro';intro.textContent='不用一次背完。白十字靠观察；白角重复小循环；黄十字和黄顶各用同一公式。最后换棱继续用小鱼，左小鱼只是右小鱼的镜像。每课只练到“什么时候停”，再学下一课；三维演示接着同一局样例拼到完成。';content.append(intro);
   const index=document.createElement('nav');index.className='lesson-index';index.setAttribute('aria-label','七步学习目录');
   lessons.forEach((entry,i)=>{const link=document.createElement('a');link.href='#lesson-'+i;link.textContent=(i+1)+' '+entry.title;link.onclick=event=>{event.preventDefault();const target=document.querySelector('#lesson-'+i);target.open=true;target.scrollIntoView({block:'start',behavior:'smooth'})};index.append(link)});content.append(index);
   lessons.forEach((entry,i)=>{
@@ -46,6 +46,6 @@ async function showCourse(key){
   const intro=document.createElement('p');intro.className='course-intro';intro.textContent='先完成前两层和黄色顶面，再学 PLL。21 类图鉴只调整顶层位置；粉色箭头是角块，绿色箭头是棱块。每张卡都可演示，做完后可能还需要 U / U′ / U2 对齐。';content.append(intro);
   try{const data=await(await fetch('algs.json')).json();if(version!==generation)return;const grid=document.createElement('div');grid.className='pll-atlas';for(const entry of data.filter(d=>d.group==='PLL')){const example=normalizePll(entry.algs[0]);const card=document.createElement('article');card.className='pll-study-card';const title=document.createElement('h2');title.textContent=entry.name;const figure=document.createElement('div');figure.className='pll-diagram';figure.innerHTML=pllDiagram(example.state,'pll-'+entry.name.replace(/\W/g,''));const formula=document.createElement('p');formula.className='formula';formula.textContent=example.alg;card.append(title,figure,formula);addLessonDemo(card,example.alg,'PLL '+entry.name,'pll',0,example.state);grid.append(card)}content.append(grid)}catch{if(version!==generation)return;content.textContent='PLL 图鉴暂时无法读取，请刷新重试。'}
  }
- const note=document.createElement('p');note.className='tutorial-source';note.innerHTML='记号：R 右、U 顶、F 前；撇号是逆时针，2 是半圈。小写字母／w 是双层，M/E/S 是中层，x/y/z 是整体。顺逆时针从正对该面判断。'+(key==='beginner'?'<br>入门步骤参考 <a href="https://rubiks.com/solve-guide" target="_blank" rel="noopener">Rubik’s 官方指南</a>；图形由实际魔方状态绘制，公式与动画逐条校验。':'');content.append(note);
+ const note=document.createElement('p');note.className='tutorial-source';note.innerHTML=(key==='beginner'?'记号：R 右、L 左、U 顶、F 前、B 后；撇号是逆时针，2 是半圈。顺逆时针从正对该面判断。<br>入门步骤参考 <a href="https://rubiks.com/solve-guide" target="_blank" rel="noopener">Rubik’s 官方指南</a>；图形由实际魔方状态绘制，公式与动画逐条校验。':'记号：R 右、U 顶、F 前；撇号是逆时针，2 是半圈。小写字母／w 是双层，M/E/S 是中层，x/y/z 是整体。顺逆时针从正对该面判断。');content.append(note);
 }
 $$('[data-course]').forEach(button=>button.onclick=()=>showCourse(button.dataset.course));
