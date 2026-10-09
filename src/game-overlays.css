@@ -1,8 +1,20 @@
 .course-window-actions{display:flex;align-items:center;gap:12px}
+.game-play-area{display:flex;flex-direction:column;gap:16px;min-width:0;min-height:0}
+.game-play-area .game-stage{flex:1;height:auto;min-height:180px;padding-bottom:20px;overflow:hidden}
+.game-controls{flex-shrink:0;text-align:center;padding:0 8px}
+.game-controls .cube-hint{margin:0 0 10px;color:#9aa88a;font-size:10px}
+.game-controls .move-controls{margin:0 auto 12px;max-width:300px}
+.game-controls .move-controls button{min-height:36px}
+.game-controls .cube-actions{flex-wrap:wrap;gap:8px}
+.game-controls .cube-actions button{min-height:40px;padding:10px 16px;font-size:11px}
+.game-controls .current-case-button{min-height:40px;margin-top:8px;padding:10px 18px!important}
+.game-controls .scramble-details{margin-top:10px}
+@media(max-width:960px) and (min-width:601px){.game-play-area{min-height:530px}}
 .game-page .app-shell{margin-left:0}
 .game-reference-tools{display:flex;justify-content:flex-end;gap:8px;margin:0 0 14px}
 .game-reference-tools button{font-size:12px;padding:8px 14px;min-height:38px;background:#fffdf7;border-radius:12px;color:#718660}
 .game-reference-tools button:hover{background:#edf3e5}
+.game-reference-tools .mobile-mode-tools:not([hidden]){align-self:auto;margin:0;min-height:36px}
 .game-page #courseDialog{position:fixed;inset:100px 20px auto auto;margin:0;width:min(540px,46vw);height:min(720px,calc(100dvh - 130px));max-height:calc(100dvh - 130px);box-shadow:0 12px 48px #42503924;z-index:55;border:1px solid #dce5cf}
 .game-page #courseDialog .course-dialog-head{padding:14px 20px;gap:10px}
 .game-page #courseDialog .course-dialog-head h2{font-size:18px}
@@ -38,6 +50,19 @@
 }
 @media(min-width:601px) and (max-width:760px){#modeToolsDialog{inset:auto 12px 12px;width:auto}}
 @media(max-width:600px){
+ .game-page .game-main{height:calc(100dvh - 50px - env(safe-area-inset-top) - env(safe-area-inset-bottom));min-height:0;overflow:auto}
+ .game-play-area{gap:12px}
+ .game-play-area .game-stage{height:auto;min-height:180px;padding-bottom:10px}
+ .game-controls{padding:0}
+ .game-controls .cube-hint,.game-controls .scramble-details{display:none}
+ .game-controls .mobile-turn-tools{margin:0 0 6px}
+ .game-controls .mobile-turn-tools>summary{padding:5px;min-height:30px}
+ .game-controls .move-controls{margin:5px auto 8px}
+ .game-controls .cube-actions button{min-height:40px;padding:10px 12px;font-size:11px}
+ .game-page.mobile-handbook-open .game-play-area{flex:none;height:calc(52dvh - 175px - env(safe-area-inset-top) - env(safe-area-inset-bottom))}
+ .game-page.mobile-tutorial-open .game-play-area{flex:none;height:calc(48dvh - 175px - env(safe-area-inset-top) - env(safe-area-inset-bottom))}
+ .game-page.mobile-handbook-open .game-play-area .game-stage,.game-page.mobile-tutorial-open .game-play-area .game-stage{height:auto;min-height:130px}
+ .mobile-handbook-open .game-controls,.mobile-tutorial-open .game-controls{display:none}
  .game-page{padding-bottom:env(safe-area-inset-bottom)}
  .game-reference-tools{justify-content:flex-start;margin:0;gap:8px}
  .game-reference-tools button{font-size:11px;min-height:36px;padding:7px 12px}

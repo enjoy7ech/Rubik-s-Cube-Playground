@@ -20,11 +20,11 @@ export function initGameOverlays(){
  popup.querySelector('.close').onclick=()=>popup.close();
  const panels={timer:document.querySelector('.timer-panel'),formula:document.querySelector('.formula-panel')},homes={};
  for(const [mode,panel]of Object.entries(panels)){const marker=document.createComment(mode+' panel home');panel.before(marker);homes[mode]=marker}
- const reopen=document.createElement('button');reopen.className='outline mobile-mode-tools';reopen.hidden=true;document.querySelector('.stage-top').after(reopen);
+ const reopen=document.createElement('button');reopen.className='outline mobile-mode-tools';reopen.hidden=true;document.querySelector('.game-reference-tools').append(reopen);
  const host=popup.querySelector('.mode-tools-body');
  const restore=()=>{for(const [mode,panel]of Object.entries(panels))homes[mode].after(panel)};
  const show=()=>{const mode=document.body.dataset.mode;if(!mobile.matches||!panels[mode])return;restore();host.replaceChildren(panels[mode]);popup.querySelector('h2').textContent=mode==='timer'?'计时挑战':'公式练习';if(!popup.open)popup.show();host.scrollTop=0};
- const sync=(open=true)=>{const mode=document.body.dataset.mode||'free';reopen.hidden=!mobile.matches||mode==='free';reopen.textContent=mode==='timer'?'◷ 打开计时面板':'▧ 打开公式工具';if(!mobile.matches||mode==='free'){popup.close();restore()}else if(open)show()};
+ const sync=(open=true)=>{const mode=document.body.dataset.mode||'free';reopen.hidden=!mobile.matches||mode==='free';reopen.textContent=mode==='timer'?'◷ 计时面板':'▧ 公式工具';if(!mobile.matches||mode==='free'){popup.close();restore()}else if(open)show()};
  let observedMode=document.body.dataset.mode;reopen.onclick=show;new MutationObserver(()=>{const mode=document.body.dataset.mode;if(mode!==observedMode){observedMode=mode;sync()}}).observe(document.body,{attributes:true,attributeFilter:['data-mode']});mobile.addEventListener('change',()=>sync(false));sync();
  document.querySelector('.mobile-mode-select')?.addEventListener('pointerdown',()=>popup.close());
  const records=document.createElement('details');records.className='mode-records';records.open=!mobile.matches;mobile.addEventListener('change',()=>records.open=!mobile.matches);const summary=document.createElement('summary');summary.textContent='查看计时记录';records.append(summary);for(const el of panels.timer.querySelectorAll('.history-head,.history'))records.append(el);panels.timer.append(records);
