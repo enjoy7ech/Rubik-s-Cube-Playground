@@ -10,7 +10,8 @@ export function initGameOverlays(){
  course.querySelector('[data-course-home]').onclick=home;
  course.querySelector('#courseContent').addEventListener('click',async event=>{const button=event.target.closest('[data-course]');if(!button)return;button.disabled=true;try{lessonModule??=await import('./lessons.js');if(course.open)await lessonModule.showCourse(button.dataset.course)}catch{toast('教程暂时无法读取，请重试。')}finally{button.disabled=false}});
  const courseState=()=>document.body.classList.toggle('mobile-tutorial-open',course.open);new MutationObserver(courseState).observe(course,{attributes:true,attributeFilter:['open']});
- for(const link of document.querySelectorAll('a[href="tutorials.html"]'))link.addEventListener('click',event=>{event.preventDefault();document.querySelector('#modeToolsDialog')?.close();if(!course.querySelector('#courseContent').children.length)home();if(!course.open)course.show();courseState()});
+ for(const link of document.querySelectorAll('a[href="tutorials.html"], [data-open-tutorial]'))link.addEventListener('click',event=>{event.preventDefault();document.querySelector('#modeToolsDialog')?.close();document.querySelector('#handbookDialog')?.close();if(!course.querySelector('#courseContent').children.length)home();if(!course.open)course.show();courseState()});
+ document.querySelector('[data-open-handbook]').addEventListener('click',()=>{course.close();document.querySelector('#modeToolsDialog')?.close()});
  course.addEventListener('close',()=>{lessonModule?.pauseCourse?.();courseState()});
  course.addEventListener('click',event=>{const link=event.target.closest('a[href]');if(link&&link.getAttribute('href').match(/^(index|library)\.html/)){event.preventDefault();window.open(link.href,'_blank','noopener')}});
 

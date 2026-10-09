@@ -57,7 +57,7 @@ const viewHelp=document.createElement('p');viewHelp.textContent='面字母按当
 
 const handbook=$('#handbookDialog'),handbookFrame=$('#handbookFrame');
 function openHandbook(favorites=false){handbookMinimized=false;restoreHandbook.hidden=true;if(!handbookFrame.hasAttribute('src'))handbookFrame.src='library.html?handbook=1'+(favorites?'&favorites=1':'');else if(favorites)handbookFrame.contentWindow?.postMessage({type:'handbook-favorites'},location.origin);if(!handbook.open)handbook.show()}
-$$('a[href^="library.html"]').forEach(link=>link.addEventListener('click',event=>{event.preventDefault();openHandbook(link.getAttribute('href').includes('favorites'))}));
+$$('a[href^="library.html"], [data-open-handbook]').forEach(link=>link.addEventListener('click',event=>{event.preventDefault();openHandbook((link.getAttribute('href')||'').includes('favorites'))}));
 handbook.addEventListener('close',()=>{restoreHandbook.hidden=!handbookMinimized;handbookFrame.contentWindow?.postMessage({type:'handbook-close'},location.origin)});
 window.addEventListener('message',event=>{if(event.origin===location.origin&&event.source===handbookFrame.contentWindow&&event.data?.type==='handbook-dismiss')handbook.close()});
 
