@@ -14,7 +14,8 @@ export function initCurrentCase({getSnapshot,canRead,applySteps,toast}){
   refresh.disabled=true;status.textContent='正在按固定入门方法安排摆放和重复次数…';
   try{const match=await guideNext(state,panel.querySelector('[data-base]').value);if(version!==request)return;
    panel.querySelector('.layer-progress').innerHTML=stageNames.map((name,i)=>`<span class="${i<match.stage?'done':i===match.stage?'active':''}">${i<match.stage?'✓ ':''}${name}</span>`).join('');
-   panel.querySelector('[data-goal]').textContent=lessons[match.stage]?.goal||'六面已还原，你完成啦！';if(match.stage===7){status.textContent='已经全部拼好啦！';return}
+   const colorNames=['黄','白','粉','橙','绿','蓝'],teaching=match.teachingState;
+   panel.querySelector('[data-goal]').textContent=(lessons[match.stage]?.goal||'六面已还原，你完成啦！').replace(/[白黄]/g,color=>teaching?colorNames[teaching.find(s=>s.p.join(',')===(color==='白'?'0,-1,0':'0,1,0')).c]:color);if(match.stage===7){status.textContent='已经全部拼好啦！';return}
    status.textContent=`下一步：${stageNames[match.stage]} · 已完成 ${match.scores[match.scoreIndex]} / 4`;
    if(!match.results.length){results.textContent='暂时无法安排下一轮，请重新读取当前局面。';return}
    for(const result of match.results){
@@ -30,7 +31,7 @@ export function initCurrentCase({getSnapshot,canRead,applySteps,toast}){
     const play=document.createElement('button');play.className='primary';play.textContent='演示摆放和重复过程';play.onclick=()=>{
      player??=new AlgorithmPlayer(panel.querySelector('[data-preview]'));player.stepDelay=650;player.turnDuration=500;
      player.guideBaseUpdate??=player.update.bind(player);
-     player.update=()=>{player.guideBaseUpdate();let cursor=player.index,round=0;while(round<result.parts.length&&cursor>=result.parts[round].tokens.length){cursor-=result.parts[round].tokens.length;round++}const part=result.parts[round],chip=document.createElement('span');chip.className='current';chip.textContent=!part?'本轮完成':cursor<part.preparation.length?'第 '+(round+1)+' 轮，先摆放：'+part.tokens[cursor]:'第 '+(round+1)+' 轮，固定公式第 '+(Math.floor((cursor-part.preparation.length)/part.formula.split(' ').length)+1)+' / '+part.repeats+' 次：'+part.tokens[cursor];player.steps.replaceChildren(chip)};
+     player.update=()=>{player.guideBaseUpdate();let cursor=player.index,round=0;while(round<result.parts.length&&cursor>=result.parts[round].tokens.length){cursor-=result.parts[round].tokens.length;round++}const part=result.parts[round],chip=document.createElement('span');chip.className='current';const token=part?player.scene.toViewToken(part.tokens[cursor]):'';chip.textContent=!part?'本轮完成':cursor<part.preparation.length?'第 '+(round+1)+' 轮，先摆放：'+token:'第 '+(round+1)+' 轮，固定公式第 '+(Math.floor((cursor-part.preparation.length)/part.formula.split(' ').length)+1)+' / '+part.repeats+' 次：'+token;player.steps.replaceChildren(chip)};
      player.load(result.alg,3,state);panel.querySelector('[data-preview]').scrollIntoView({block:'nearest',behavior:'smooth'});
     };
     const doStep=document.createElement('button');doStep.className='outline small';doStep.textContent=match.stage===3?'摆好方向，做一次':'帮我做完整轮';doStep.onclick=()=>{if(applySteps(state,result.alg,()=>{panel.querySelector('[data-base]').value='D';setTimeout(()=>{if(panel.open)search()},0)})){doStep.disabled=true;doStep.textContent='正在做完整轮…'}};card.append(play,doStep);results.append(card);

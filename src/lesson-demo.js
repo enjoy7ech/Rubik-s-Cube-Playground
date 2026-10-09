@@ -15,7 +15,7 @@ export function addLessonDemo(lesson,alg,title,course,index,customInitial=null){
  thumb.onclick=()=>{
   pauseLessonDemo();activeThumb=thumb;thumb.hidden=true;slot.append(holder);player??=new AlgorithmPlayer(holder);player.stepDelay=800;player.turnDuration=550;
   player.baseLessonUpdate??=player.update.bind(player);
-  player.update=()=>{player.baseLessonUpdate();const token=player.tokens[player.index];player.steps.replaceChildren();const chip=document.createElement('span');chip.className='current';chip.textContent=token?'下一转：'+describe(token):'这一轮做完，再观察';player.steps.append(chip);holder.querySelector('.lesson-demo-note').textContent=chapter?(chapter.notes[player.index]||chapter.notes.at(-1)):course==='advanced'?'这是本课的独立样例。可以暂停、重播或拖动，观察这一步怎样完成。':'按图摆好方向，完整做公式。可以暂停、重播或拖动看侧面。'};
+  player.update=()=>{player.baseLessonUpdate();const token=player.tokens[player.index];player.steps.replaceChildren();const chip=document.createElement('span');chip.className='current';chip.textContent=token?'下一转：'+describe(player.scene.toViewToken(token)):'这一轮做完，再观察';player.steps.append(chip);holder.querySelector('.lesson-demo-note').textContent=chapter?(chapter.notes[player.index]||chapter.notes.at(-1)):course==='advanced'?'这是本课的独立样例。可以暂停、重播或拖动，观察这一步怎样完成。':'按图摆好方向，完整做公式。可以暂停、重播或拖动看侧面。'};
   player.load(alg,3,initial);
  };
  const owner=lesson.closest('details');owner?.addEventListener('toggle',()=>{if(!owner.open&&holder.parentElement===slot)pauseLessonDemo()});
