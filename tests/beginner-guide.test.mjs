@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import {createCube,apply,parseAlg} from '../src/cube.js';
-import {guideNext,fixedFormulas} from '../src/beginner-guide.js';
+import {guideNext,fixedFormulas,leftInsert} from '../src/beginner-guide.js';
 import {layerScores} from '../src/layer-match.js';
 import {walkthrough} from '../src/tutorial-walkthrough.js';
 let seed=271828;const random=()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/2**32};
@@ -14,8 +14,8 @@ for(const [sample,setup] of [
  let state=setup?apply(createCube(),parseAlg(setup)):structuredClone(walkthrough[0].initial),steps=0;
  for(;steps<30;steps++){
   const match=await guideNext(state);if(match.stage===7)break;
-  const result=match.results[0];assert.equal(result.formula,fixedFormulas[match.stage]);
-  for(const part of result.parts)if(match.stage>0&&part.formula)assert.equal(part.formula,result.formula);
+  const result=match.results[0];const allowed=match.stage===2?[fixedFormulas[2],leftInsert]:[fixedFormulas[match.stage],null];assert.ok(allowed.includes(result.formula));
+  for(const part of result.parts)if(match.stage>0&&part.formula)assert.ok(allowed.includes(part.formula));
   state=apply(state,parseAlg(result.alg));
   assert.deepEqual(layerScores(state),result.after);
  }

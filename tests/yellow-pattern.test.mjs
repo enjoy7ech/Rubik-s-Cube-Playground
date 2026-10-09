@@ -1,10 +1,10 @@
 import assert from 'node:assert/strict';
 import {apply,parseAlg} from '../src/cube.js';
-import {walkthrough} from '../src/tutorial-walkthrough.js';
+import {sampleFor} from '../src/tutorial-diagrams.js';
 import {yellowPattern,yellowCrossStep} from '../src/beginner-teaching.js';
 import {layerScores} from '../src/layer-match.js';
 const formula=parseAlg("F R U R' U' F'"),expected=['dot','L','line','cross'];
-let state=structuredClone(walkthrough[3].initial);
+let state=sampleFor("F R U R' U' F' U2 F R U R' U' F' F R U R' U' F'");
 for(let i=0;i<3;i++){
  assert.equal(yellowPattern(state),expected[i]);
  for(const setup of [[],['U'],["U'"],['U2']]){

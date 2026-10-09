@@ -1,7 +1,7 @@
 import {createCube,apply,parseAlg,move} from './cube.js';
 
 // A legal example with no initial petals and an unfinished yellow cross after D is solved.
-export const whiteCrossSetup="F R U R' U' F' R U' R U R U R U' R' U' R2 F2 R2 B2 L2 U F R B L";
+export const whiteCrossSetup="R2 U R U R' U' R' U' R' U R' F R U R' U' F' R U' R U R U R U' R' U' R2 F2 R2 B2 L2 U F R B L";
 export const whiteCrossInitial=apply(createCube(),parseAlg(whiteCrossSetup));
 const state=structuredClone(whiteCrossInitial);
 export const whiteCrossMoves=["L'","B'","R'","F'"];

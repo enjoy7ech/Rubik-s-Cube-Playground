@@ -1,0 +1,62 @@
+.tutorial-main{max-width:1160px;margin:0 auto;padding:32px 28px 60px}
+.tutorial-heading h1{font-size:28px;margin:0 0 10px;color:#43513d}
+.tutorial-heading p,.course-intro{font-size:14px;line-height:1.9;color:#7e8c73}
+.tutorial-methods{display:flex;gap:8px;margin:24px 0}
+.tutorial-methods button{font-size:14px;padding:12px 18px;border-radius:14px;border:1px solid #dde5d3;background:#fffdf6;color:#869676}
+.tutorial-methods button.active{background:#e3ecd6;color:#536d43;border-color:#c8d8b5}
+.lesson-index{display:flex;gap:7px;flex-wrap:wrap;margin:20px 0}
+.lesson-index a{font-size:12px;padding:8px 11px;background:#edf2e6;border-radius:9px;color:#75886a;text-decoration:none}
+.rewritten-lesson{padding:20px;margin:16px 0;border:1px solid #dde5d4;border-radius:20px;background:#fffdf8;scroll-margin-top:20px}
+.rewritten-lesson>summary{font-size:20px;cursor:pointer;color:#516846;padding:4px 0}
+.method-goal{font-size:14px!important;line-height:1.9;color:#7b8f6a;padding:12px 0}
+.formula-guide{padding:20px;margin-top:18px;background:#f1f5e9;border-radius:16px;color:#6d815d}
+.formula-guide h3{font-size:18px;margin:0 0 12px;color:#526d43}
+.formula-guide .formula-main{font-size:20px;line-height:1.8;letter-spacing:.03em;padding:14px 18px;background:#fffdf6;border:1px solid #dee8d0;border-radius:12px;overflow-wrap:anywhere;margin:12px 0}
+.formula-purpose{font-size:14px;line-height:1.9;color:#708565}
+.formula-guide ol{padding-left:23px;font-size:14px;line-height:1.9;margin-bottom:0}
+.formula-guide li{padding-left:5px;margin:12px 0}
+.formula-guide li::marker{color:#97aa85;font-weight:600}
+.formula-extra{border-top:1px solid #dbe5ce;margin-top:18px;padding-top:12px;font-size:13px;line-height:1.9}
+.formula-extra summary,.formula-illustrations>summary{cursor:pointer;color:#7c946b}
+.formula-illustrations{margin-top:20px;font-size:13px}
+.formula-illustrations>summary{padding:10px 0}
+.method-cases{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin:16px 0}
+.process-flow{grid-template-columns:repeat(4,minmax(0,1fr))}
+.process-flow>.method-case:not(:last-child)::after{content:'→';position:absolute;right:-18px;top:90px;z-index:1;border-radius:50%;background:#fffdf6;color:#8ca477;font-size:22px;line-height:28px;width:28px;text-align:center}
+.method-case{position:relative;border:1px solid #e1e8d7;border-radius:16px;padding:18px;background:#f6f8ef;min-width:0}
+.method-case.active{border-color:#9db686;background:#edf4e4}
+.method-case h3{font-size:16px;margin:0 0 12px;color:#586f48}
+.method-case>p{font-size:13px;line-height:1.85;color:#7b8b6f;margin:9px 0}
+.method-case>p>strong{color:#71865f}
+.method-case .case-identify{color:#94a087}
+.method-case .case-result{color:#769b64;margin-top:14px}
+.method-diagram{display:grid;place-items:center;min-height:100px;margin:10px 0 16px}
+.method-diagram svg{width:100%;max-height:165px}
+.method-case dl{display:grid;grid-template-columns:58px 1fr;gap:9px 10px;font-size:13px;line-height:1.8;margin:12px 0}
+.method-case dt{font-weight:600;color:#789166}
+.method-case dd{margin:0;color:#7f8c74}
+.method-case .formula{font-size:13px;line-height:1.8;word-break:break-word;padding:10px 12px;border-radius:10px;background:#fffdf6;color:#61764f}
+.method-check{font-size:13px;line-height:1.9;padding:12px 15px;border-radius:12px;background:#eaf1df;color:#75886a}
+.lesson-complete{display:flex;align-items:center;gap:9px;font-size:13px;color:#829572;margin-top:16px}
+.rewritten-lesson>.lesson-demo-slot{margin-top:18px}
+.rewritten-lesson>.button{display:inline-block;font-size:12px;padding:10px 13px;margin-top:10px;text-decoration:none}
+.current-shape{display:inline-block;font-size:11px;background:#dbe9cc;border-radius:8px;padding:4px 8px;margin-bottom:9px;color:#6b8754}
+.other-shapes{font-size:12px;color:#839775;margin:14px 0}
+.other-shapes summary{cursor:pointer;padding:8px 0}
+.other-shapes .method-case{margin:9px 0}
+#currentCaseDialog .method-cases{grid-template-columns:1fr}
+#currentCaseDialog .method-case{padding:12px}
+#currentCaseDialog .method-case h3{font-size:14px}
+#currentCaseDialog .method-case dl{font-size:12px;grid-template-columns:48px 1fr}
+.pll-atlas{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:20px}
+.pll-study-card{padding:18px;background:#fffdf6;border:1px solid #dee6d4;border-radius:18px;min-width:0}
+.pll-study-card h2{font-size:18px;color:#6f855d;margin:0 0 10px}
+.pll-diagram svg{width:100%;height:160px}
+.pll-study-card .formula{font-size:11px;line-height:1.8;overflow-wrap:anywhere;min-height:40px}
+.pll-study-card .lesson-demo-card{padding:9px;margin:10px 0 0;gap:8px}
+.pll-study-card .lesson-demo-card canvas{display:none}
+.pll-study-card .lesson-demo-card b{font-size:12px}
+.tutorial-source{font-size:12px;line-height:1.9;color:#95a087;margin-top:30px}
+@media(max-width:750px){.method-cases{grid-template-columns:1fr}.pll-atlas{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:750px){.process-flow>.method-case:not(:last-child)::after{content:'↓';top:auto;right:calc(50% - 14px);bottom:-20px}}
+@media(max-width:600px){.tutorial-main{padding:20px 12px 30px}.tutorial-heading h1{font-size:23px}.tutorial-heading p,.course-intro{font-size:13px}.tutorial-methods button{font-size:13px;padding:10px 13px}.rewritten-lesson{padding:14px}.rewritten-lesson>summary{font-size:17px}.method-case{padding:14px}.method-case dl{font-size:13px}.method-cases{gap:10px}.lesson-index a{font-size:11px;padding:7px 9px}.pll-atlas{grid-template-columns:1fr}.pll-diagram svg{height:150px}.formula-guide{padding:14px}.formula-guide .formula-main{font-size:17px;padding:12px}.formula-guide ol,.formula-purpose{font-size:13px}}
